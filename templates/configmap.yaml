@@ -1,0 +1,18 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: omero-config
+data:
+
+  web.omero: |
+    {{- if .Values.prefix }}
+    config set -- omero.web.prefix {{ .Values.prefix }}
+    config set -- omero.web.static_url {{ .Values.prefix }}/static
+    {{- end }}
+
+    {{- range $key, $value := .Values.config.set }}
+    config set -- {{ $key }} {{ $value }}
+    {{- end }}
+    {{- range $key, $value := .Values.config.append }}
+    config append -- {{ $key }} {{ $value }}
+    {{- end }}

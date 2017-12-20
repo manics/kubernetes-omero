@@ -1,0 +1,32 @@
+# Default values for omero-web
+replicaCount: 1
+
+image:
+  repository: openmicroscopy/omero-web
+  tag: 5.4.1
+  pullPolicy: IfNotPresent
+service:
+  name: omero-web
+  type: ClusterIP
+  externalPort: 80
+resources: {}
+
+prefix:
+serverList: '[["omero-server", 4064, "omero"]]'
+config:
+  set: {}
+  append: {}
+
+nginx:
+  image:
+    repository: library/nginx
+    tag: 1.13.7
+    pullPolicy: IfNotPresent
+  resources: {}
+  generateConf: true
+
+ingress:
+  enabled: false
+  hosts:
+  annotations:
+  tls:
