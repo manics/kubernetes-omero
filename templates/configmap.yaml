@@ -10,6 +10,12 @@ data:
     config set -- omero.web.static_url {{ .Values.prefix }}/static
     {{- end }}
 
+    {{- if .Values.redis.enabled }}
+    config set -- omero.web.session_engine django.contrib.sessions.backends.cache
+    config set -- omero.web.caches '{ "default": { "BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://:{{ .Values.redis.redisPassword }}@{{ .Release.Name }}-redis:6379/0" } }'
+
+    {{- end }}
+
     {{- range $key, $value := .Values.config.set }}
     config set -- {{ $key }} {{ $value }}
     {{- end }}

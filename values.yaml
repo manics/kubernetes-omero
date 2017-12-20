@@ -30,3 +30,11 @@ ingress:
   hosts:
   annotations:
   tls:
+
+redis:
+  enabled: true
+  # TODO: Use the augenerated redis secret instead
+  redisPassword: ChAnGeMe
+  persistence:
+    # Session storage only
+    enabled: false
