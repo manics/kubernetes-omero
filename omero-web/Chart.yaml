@@ -1,7 +1,7 @@
 apiVersion: v1
 description: OMERO.web
 name: omero-web
-version: 0.1.1
+version: 0.1.2
 appVersion: 5.4.1
 maintainers:
 - name: Open Microscopy Environment
