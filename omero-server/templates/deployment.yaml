@@ -1,0 +1,62 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "omero-server.fullname" . }}
+  labels:
+    app: {{ template "omero-server.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "omero-server.name" . }}
+        release: {{ .Release.Name }}
+      annotations:
+        # Autorestart when the configmap changes!
+        checksum/config-map: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}"
+          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+          env:
+          # In openmicroscopy/omero-server these CONFIG envvars have higher
+          # precedence than .omero config files
+          - name: CONFIG_omero_db_host
+          {{- if and .Values.server.databaseHost }}
+            value: {{ .Values.server.databaseHost }}
+          {{- else }}
+            value: {{ .Release.Name }}-postgresql
+          {{- end }}
+          - name: CONFIG_omero_db_name
+            value: {{ .Values.postgresql.postgresDatabase }}
+          - name: CONFIG_omero_db_user
+            value: {{ .Values.postgresql.postgresUser }}
+          - name: CONFIG_omero_db_pass
+            value: {{ .Values.postgresql.postgresPassword }}
+          # Only used when initialising a new OMERO database
+          - name: ROOTPASS
+            value: {{ .Values.server.defaultRootPassword }}
+          ports:
+          #  - containerPort: 4061
+            - containerPort: 4063
+            - containerPort: 4064
+          # livenessProbe:
+          # readinessProbe:
+          volumeMounts:
+            - name: omero-server-config
+              mountPath: /opt/omero/server/config/server.omero
+              subPath: server.omero
+          resources:
+{{ toYaml .Values.server.resources | indent 12 }}
+      volumes:
+        - name: omero-server-config
+          configMap:
+            name: omero-server-config
+    {{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+    {{- end }}

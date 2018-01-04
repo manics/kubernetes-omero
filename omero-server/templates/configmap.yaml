@@ -1,0 +1,13 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: omero-server-config
+data:
+
+  server.omero: |
+    {{- range $key, $value := .Values.server.config.set }}
+    config set -- {{ $key }} {{ $value }}
+    {{- end }}
+    {{- range $key, $value := .Values.server.config.append }}
+    config append -- {{ $key }} {{ $value }}
+    {{- end }}
