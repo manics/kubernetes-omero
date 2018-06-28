@@ -5,6 +5,10 @@ metadata:
 data:
 
   web.omero: |
+    {{- if .Values.web.secure }}
+    config set -- omero.web.secure true
+    {{- end }}
+
     {{- if .Values.web.prefix }}
     config set -- omero.web.prefix {{ .Values.web.prefix }}
     config set -- omero.web.static_url {{ .Values.web.prefix }}/static

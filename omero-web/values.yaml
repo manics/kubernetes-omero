@@ -4,7 +4,7 @@ replicaCount: 1
 web:
   image:
     repository: openmicroscopy/omero-web
-    tag: 5.4.1
+    tag: 5.4.5
     pullPolicy: IfNotPresent
   resources: {}
   prefix:
@@ -12,6 +12,7 @@ web:
   config:
     set: {}
     append: {}
+  secure: true
 
 nginx:
   image:
