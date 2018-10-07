@@ -5,9 +5,12 @@ metadata:
 data:
 
   server.omero: |
-    {{- range $key, $value := .Values.server.config.set }}
+    {{- range $key, $value := .Values.config.set }}
     config set -- {{ $key }} {{ $value }}
     {{- end }}
-    {{- range $key, $value := .Values.server.config.append }}
+
+    {{- range $keyvalues := .Values.config.append }}
+    {{- range $key, $value := $keyvalues }}
     config append -- {{ $key }} {{ $value }}
+    {{- end }}
     {{- end }}

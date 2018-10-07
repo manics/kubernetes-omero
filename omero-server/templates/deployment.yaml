@@ -1,62 +1,118 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ template "omero-server.fullname" . }}
+  name: {{ include "omero-server.fullname" . }}
   labels:
-    app: {{ template "omero-server.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app.kubernetes.io/name: {{ include "omero-server.name" . }}
+    helm.sh/chart: {{ include "omero-server.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "omero-server.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  strategy:
+    type: {{ .Values.deploymentStrategy }}
+  {{- if ne .Values.deploymentStrategy "RollingUpdate" }}
+    rollingUpdate: null
+  {{- end }}
   template:
     metadata:
       labels:
-        app: {{ template "omero-server.name" . }}
-        release: {{ .Release.Name }}
+        app.kubernetes.io/name: {{ include "omero-server.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
       annotations:
         # Autorestart when the configmap changes!
-        checksum/config-map: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
+      {{- if .Values.securityContext.enabled }}
+      securityContext:
+        fsGroup: {{ .Values.securityContext.fsGroup }}
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}"
-          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           # In openmicroscopy/omero-server these CONFIG envvars have higher
           # precedence than .omero config files
-          - name: CONFIG_omero_db_host
-          {{- if and .Values.server.databaseHost }}
-            value: {{ .Values.server.databaseHost }}
-          {{- else }}
-            value: {{ .Release.Name }}-postgresql
-          {{- end }}
-          - name: CONFIG_omero_db_name
-            value: {{ .Values.postgresql.postgresDatabase }}
-          - name: CONFIG_omero_db_user
-            value: {{ .Values.postgresql.postgresUser }}
-          - name: CONFIG_omero_db_pass
-            value: {{ .Values.postgresql.postgresPassword }}
-          # Only used when initialising a new OMERO database
-          - name: ROOTPASS
-            value: {{ .Values.server.defaultRootPassword }}
+            - name: CONFIG_omero_db_host
+            {{- if .Values.databaseHost }}
+              value: {{ .Values.databaseHost }}
+            {{- else }}
+              value: {{ include "omero-server.name" . }}-postgresql
+            {{- end }}
+            - name: CONFIG_omero_db_name
+              value: {{ .Values.postgresql.postgresDatabase }}
+            - name: CONFIG_omero_db_user
+              value: {{ .Values.postgresql.postgresUser }}
+            - name: CONFIG_omero_db_pass
+              value: {{ .Values.postgresql.postgresPassword }}
+            # Only used when initialising a new OMERO database
+            - name: ROOTPASS
+              value: {{ .Values.defaultRootPassword }}
           ports:
-          #  - containerPort: 4061
-            - containerPort: 4063
-            - containerPort: 4064
+            # - name: ice-location
+            #   containerPort: 4061
+            #   protocol: TCP
+            # - name: ice-router
+            #   containerPort: 4063
+            #   protocol: TCP
+            - name: ice-srouter
+              containerPort: 4064
+              protocol: TCP
           # livenessProbe:
+          #   exec:
+          #     command:
+          #       - /opt/omero/server/OMERO.server/bin/omero
+          #       - admin
+          #       - status
+          #   initialDelaySeconds: 300
+          #   periodSeconds: 60
+          #   timeoutSeconds: 15
+          #   failureThreshold: 15
           # readinessProbe:
+          #   exec:
+          #     command:
+          #       - /opt/omero/server/OMERO.server/bin/omero
+          #       - admin
+          #       - status
+          #   initialDelaySeconds: 60
+          #   periodSeconds: 60
+          #   timeoutSeconds: 15
+          #   failureThreshold: 15
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
           volumeMounts:
+            - name: data
+              mountPath: /OMERO
+              subPath: {{ .Values.persistence.subPath }}
             - name: omero-server-config
               mountPath: /opt/omero/server/config/server.omero
               subPath: server.omero
-          resources:
-{{ toYaml .Values.server.resources | indent 12 }}
       volumes:
+        - name: data
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "omero-server.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
         - name: omero-server-config
           configMap:
             name: omero-server-config
-    {{- if .Values.nodeSelector }}
+    {{- with .Values.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.nodeSelector | indent 8 }}
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
     {{- end }}
