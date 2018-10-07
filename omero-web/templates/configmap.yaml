@@ -5,14 +5,11 @@ metadata:
 data:
 
   web.omero: |
-    {{- if .Values.web.secure }}
     config set -- omero.web.secure true
-    {{- end }}
+    config set -- omero.web.server_list '{{ .Values.serverList | toJson }}'
 
-    {{- if .Values.web.prefix }}
-    config set -- omero.web.prefix {{ .Values.web.prefix }}
-    config set -- omero.web.static_url {{ .Values.web.prefix }}/static
-    {{- end }}
+    config set -- omero.web.prefix {{ .Values.prefix | trimSuffix "/" }}
+    config set -- omero.web.static_url {{ .Values.prefix | trimSuffix "/" }}/static
 
     {{- if .Values.redis.enabled }}
     config set -- omero.web.session_engine django.contrib.sessions.backends.cache
@@ -20,9 +17,18 @@ data:
 
     {{- end }}
 
-    {{- range $key, $value := .Values.web.config.set }}
+    {{- range $key, $value := .Values.config.set }}
     config set -- {{ $key }} {{ $value }}
     {{- end }}
-    {{- range $key, $value := .Values.web.config.append }}
+
+    {{- range $keyvalues := .Values.config.append }}
+    {{- range $key, $value := $keyvalues }}
     config append -- {{ $key }} {{ $value }}
+    {{- end }}
+    {{- end }}
+
+    {{- range $keyvalues := .Values.config.appendJson }}
+    {{- range $key, $value := $keyvalues }}
+    config append -- {{ $key }} '{{ $value | toJson }}'
+    {{- end }}
     {{- end }}

@@ -1,99 +1,62 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ template "omero-web.fullname" . }}
+  name: {{ include "omero-web.fullname" . }}
   labels:
-    app: {{ template "omero-web.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app.kubernetes.io/name: {{ include "omero-web.name" . }}
+    helm.sh/chart: {{ include "omero-web.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "omero-web.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "omero-web.name" . }}
-        release: {{ .Release.Name }}
+        app.kubernetes.io/name: {{ include "omero-web.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
       annotations:
         # Autorestart when the configmap changes!
-        checksum/config-map: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
-      {{- if and .Values.nginx.generateConf }}
-      initContainers:
-        - name: {{ .Chart.Name }}-nginx-init
-          image: "{{ .Values.web.image.repository }}:{{ .Values.web.image.tag }}"
-          imagePullPolicy: {{ .Values.web.image.pullPolicy }}
-          command:
-            - sh
-          args:
-            - -euxc
-            - >
-              /opt/omero/web/config/omero-web-config-update.sh &&
-              /opt/omero/web/venv/bin/python /opt/omero/web/OMERO.web/bin/omero
-              web config nginx > /opt/omero/web/nginx/omero-web.conf
-          volumeMounts:
-            - name: omero-web-config
-              mountPath: /opt/omero/web/config/web.omero
-              subPath: web.omero
-            - name: omero-nginx-confd
-              mountPath: /opt/omero/web/nginx/
-      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.web.image.repository }}:{{ .Values.web.image.tag }}"
-          imagePullPolicy: {{ .Values.web.image.pullPolicy }}
-          env:
-          # In openmicroscopy/omero-web this envvar has higher precedence than
-          # .omero config files
-          - name: CONFIG_omero_web_server__list
-            value: {{ toJson .Values.web.serverList }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 4080
+            - name: http
+              containerPort: 4080
+              protocol: TCP
           livenessProbe:
             httpGet:
-              path: {{ .Values.web.prefix }}
-              port: 4080
+              path: {{ .Values.prefix }}
+              port: http
           readinessProbe:
             httpGet:
-              path: {{ .Values.web.prefix }}
-              port: 4080
+              path: {{ .Values.prefix }}
+              port: http
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
           volumeMounts:
             - name: omero-web-config
               mountPath: /opt/omero/web/config/web.omero
               subPath: web.omero
-            - name: omero-web-statics
-              mountPath: /opt/omero/web/OMERO.web/lib/python/omeroweb/static
-          resources:
-{{ toYaml .Values.web.resources | indent 12 }}
-        - name: {{ .Chart.Name }}-nginx
-          image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
-          imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
-          ports:
-            - containerPort: 80
-          # livenessProbe:
-          #   httpGet:
-          #     path: {{ .Values.prefix }}/webclient
-          #     port: 80
-          # readinessProbe:
-          #   httpGet:
-          #     path: {{ .Values.prefix }}/webclient
-          #     port: 80
-          volumeMounts:
-            - name: omero-nginx-confd
-              mountPath: /etc/nginx/conf.d/
-            - name: omero-web-statics
-              mountPath: /opt/omero/web/OMERO.web/lib/python/omeroweb/static
-          resources:
-{{ toYaml .Values.nginx.resources | indent 12 }}
       volumes:
-        - name: omero-nginx-confd
-          emptyDir: {}
-        - name: omero-web-statics
-          emptyDir: {}
         - name: omero-web-config
           configMap:
             name: omero-web-config
-    {{- if .Values.nodeSelector }}
+    {{- with .Values.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.nodeSelector | indent 8 }}
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
     {{- end }}
