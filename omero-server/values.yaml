@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: openmicroscopy/omero-server
-  tag: 5.4.8
+  repository: manics/omero-server
+  tag: dynamic-pvc-fix
   pullPolicy: IfNotPresent
 
 nameOverride: ""
