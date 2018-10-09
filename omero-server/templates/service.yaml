@@ -11,9 +11,12 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: 4064
+      targetPort: ice-srouter
       protocol: TCP
       name: ice-srouter
+    {{- if and (contains "NodePort" .Values.service.type) .Values.service.nodePort }}
+      nodePort: {{ .Values.service.nodePort }}
+    {{- end}}
   selector:
     app.kubernetes.io/name: {{ include "omero-server.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
