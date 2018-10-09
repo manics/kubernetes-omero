@@ -64,26 +64,29 @@ spec:
             - name: ice-srouter
               containerPort: 4064
               protocol: TCP
-          # livenessProbe:
-          #   exec:
-          #     command:
-          #       - /opt/omero/server/OMERO.server/bin/omero
-          #       - admin
-          #       - status
-          #   initialDelaySeconds: 300
-          #   periodSeconds: 60
-          #   timeoutSeconds: 15
-          #   failureThreshold: 15
-          # readinessProbe:
-          #   exec:
-          #     command:
-          #       - /opt/omero/server/OMERO.server/bin/omero
-          #       - admin
-          #       - status
-          #   initialDelaySeconds: 60
-          #   periodSeconds: 60
-          #   timeoutSeconds: 15
-          #   failureThreshold: 15
+          livenessProbe:
+            # Make this more lenient that readiness probe because failure
+            # will restart the pod
+            exec:
+              command:
+                - /opt/omero/server/OMERO.server/bin/omero
+                - admin
+                - status
+            initialDelaySeconds: 300
+            periodSeconds: 60
+            timeoutSeconds: 15
+            failureThreshold: 5
+          readinessProbe:
+            # Controls whether pod will receive traffic
+            exec:
+              command:
+                - /opt/omero/server/OMERO.server/bin/omero
+                - admin
+                - status
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 15
+            failureThreshold: 3
           resources:
 {{ toYaml .Values.resources | indent 12 }}
           volumeMounts:
