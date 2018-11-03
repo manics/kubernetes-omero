@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: registry.gitlab.com/manics/omero-py-alpine
-  tag: master-webapps
+  repository: registry.gitlab.com/openmicroscopy/incubator/omero-py-alpine/omero-webapps
+  tag: 5.4.9-1
   pullPolicy: IfNotPresent
 
 nameOverride: ""
