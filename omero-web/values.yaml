@@ -23,6 +23,8 @@ config:
 service:
   type: ClusterIP
   port: 80
+  # Optionally set an existing IP for type: LoadBalancer
+  loadBalancerIP:
 
 ingress:
   enabled: false

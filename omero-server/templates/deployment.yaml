@@ -65,7 +65,7 @@ spec:
               containerPort: 4064
               protocol: TCP
           livenessProbe:
-            # Make this more lenient that readiness probe because failure
+            # Make this more lenient than readiness probe because failure
             # will restart the pod
             exec:
               command:

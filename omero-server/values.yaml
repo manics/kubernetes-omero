@@ -39,6 +39,8 @@ persistence:
 service:
   type: ClusterIP
   port: 4064
+  # Optionally set an existing IP for type: LoadBalancer
+  loadBalancerIP:
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
