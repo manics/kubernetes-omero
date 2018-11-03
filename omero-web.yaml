@@ -1,8 +1,0 @@
-web:
-  serverList: '[["omero-server-omero-server", 4064, "omero"]]'
-
-ingress:
-  enabled: true
-  hosts:
-  - 10.0.17.39.xip.io
-  - 10.0.17.123.xip.io
