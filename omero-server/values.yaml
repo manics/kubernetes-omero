@@ -41,6 +41,9 @@ service:
   port: 4064
   # Optionally set an existing IP for type: LoadBalancer
   loadBalancerIP:
+  affinity:
+    enabled: true
+    clientTimeout: 3600
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

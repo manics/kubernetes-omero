@@ -20,6 +20,12 @@ spec:
     {{- if and (contains "NodePort" .Values.service.type) .Values.service.nodePort }}
       nodePort: {{ .Values.service.nodePort }}
     {{- end}}
+  {{- if .Values.service.affinity.enabled }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: {{ .Values.service.affinity.clientTimeout }}
+  {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "omero-server.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
