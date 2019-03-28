@@ -1,0 +1,13 @@
+defaultRootPassword: omero
+config:
+  set: {}
+  append: []
+
+service:
+  type: NodePort
+
+# Uses minikube dynamic hostpath volumes
+persistence:
+  # Set to false to use temporary storage
+  enabled: true
+  size: 1Gi
