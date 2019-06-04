@@ -34,7 +34,7 @@ persistence:
   annotations: {}
   size: 8Gi
   subPath:
-  resourcePolicy:
+  resourcePolicy: keep
 
 service:
   type: ClusterIP
