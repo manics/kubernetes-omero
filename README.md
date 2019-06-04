@@ -16,7 +16,7 @@ Wait for all pods to be ready:
 
     kubectl -n omero get pods
 
-Check omero-server logs to see whether server has started since health-checks aren't implemented:
+Optionally check omero-server logs:
 
     kubectl -n omero logs -f deploy/omero-server-omero-server
 
