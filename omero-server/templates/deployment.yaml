@@ -96,6 +96,8 @@ spec:
             - name: omero-server-config
               mountPath: /opt/omero/server/config/server.omero
               subPath: server.omero
+            - name: omero-server-var
+              mountPath: /opt/omero/server/OMERO.server/var
       volumes:
         - name: data
         {{- if .Values.persistence.enabled }}
@@ -107,6 +109,8 @@ spec:
         - name: omero-server-config
           configMap:
             name: omero-server-config
+        - name: omero-server-var
+          emptyDir: {}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
