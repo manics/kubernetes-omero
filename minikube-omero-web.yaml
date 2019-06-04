@@ -3,22 +3,8 @@ serverList:
   - [omero-server, 4064, omero-server]
 config:
   set:
-    # omero-iviewer
-    omero.web.viewer.view: omero_iviewer.views.index
-
   append:
   appendJson:
-    # omero-iviewer
-    - omero.web.apps: omero_iviewer
-    - omero.web.open_with:
-        - omero_iviewer
-        - omero_iviewer_index
-        - supported_objects:
-            - images
-            - dataset
-            - well
-          script_url: omero_iviewer/openwith.js
-          label: OMERO.iviewer
 
 ingress:
   enabled: true
@@ -28,7 +14,3 @@ ingress:
   tls:
   - hosts:
     - 192.168.99.100.xip.io
-
-
-redis:
-  enabled: false
