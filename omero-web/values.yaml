@@ -61,7 +61,5 @@ redis:
   enabled: true
   # TODO: Use the augenerated redis secret instead
   password: ChAnGeMe
-  master.:
-    persistence:
-      # Session storage only
-      enabled: false
+  cluster:
+    enabled: false
