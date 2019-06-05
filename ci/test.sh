@@ -60,8 +60,9 @@ done
 
 display_logs() {
   fold_start logs.1 "Display kubernetes logs"
-  echo "***** minikube *****"
-  minikube logs
+  # May crash on Travis:
+  #echo "***** minikube *****"
+  #minikube logs
   echo "***** node *****"
   kubectl describe node
   echo "***** pods *****"
