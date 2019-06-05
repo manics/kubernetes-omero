@@ -23,9 +23,6 @@ securityContext:
   fsGroup: 2000
   runAsUser: 1000
 
-# Can't use RollingUpdate because requires exclusive db access
-deploymentStrategy: Recreate
-
 persistence:
   enabled: true
   existingClaim:
@@ -35,7 +32,6 @@ persistence:
   annotations: {}
   size: 8Gi
   subPath:
-  resourcePolicy: keep
 
 service:
   type: ClusterIP
