@@ -30,7 +30,8 @@ persistence:
   enabled: true
   existingClaim:
   storageClass:
-  accessMode: ReadWriteOnce
+  accessModes:
+    - ReadWriteOnce
   annotations: {}
   size: 8Gi
   subPath:
