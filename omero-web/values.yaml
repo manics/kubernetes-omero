@@ -19,6 +19,9 @@ config:
   append: []
   appendJson: []
 
+securityContext:
+  enabled: true
+  runAsUser: 998
 
 service:
   type: ClusterIP
