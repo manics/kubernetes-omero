@@ -22,6 +22,9 @@ __version__ = '0.3.2.dev'
 
 # name of the environment variable with GitHub token
 GITHUB_TOKEN_KEY = 'GITHUB_TOKEN'
+# name of the environment variable indicating whether this is inside a
+# GitHub action
+GITHUB_ACTION_KEY = 'GITHUB_ACTION'
 
 # name of possible repository keys used in image value
 IMAGE_REPOSITORY_KEYS = {'name', 'repository'}
@@ -48,7 +51,12 @@ def git_remote(git_repo):
 
     Depending on the system setup it returns ssh or https remote.
     """
+    github_action = os.getenv(GITHUB_ACTION_KEY)
     github_token = os.getenv(GITHUB_TOKEN_KEY)
+    if github_action:
+        # GITHUB_TOKEN is set but is used differently inside an Action
+        return 'https://github.com/{0}{1}'.format(
+            git_repo, '.git' if not git_repo.endswith('.git') else '')
     if github_token:
         return 'https://{0}@github.com/{1}'.format(
             github_token, git_repo)
@@ -65,6 +73,15 @@ def last_modified_commit(*paths, **kwargs):
         '--',
         *paths
     ], **kwargs).decode('utf-8')
+
+
+def list_git_tags():
+    """Get the list of git tags"""
+    tags = check_output([
+        'git',
+        'tag',
+    ]).decode('utf-8').split()
+    return set(tags)
 
 
 def last_modified_date(*paths, **kwargs):
@@ -112,7 +129,7 @@ def render_build_args(options, ns):
     return build_args
 
 
-def build_image(image_path, image_name, build_args=None, dockerfile_path=None):
+def build_image(image_path, image_name, build_args=None, dockerfile_path=None, image_aliases=[]):
     """Build an image
 
     Args:
@@ -122,6 +139,8 @@ def build_image(image_path, image_name, build_args=None, dockerfile_path=None):
     dockerfile_path (str, optional):
         path to dockerfile relative to image_path
         if not `image_path/Dockerfile`.
+    image_aliases (list(str), optional):
+        list of additional 'name:tag' image aliases
     """
     cmd = ['docker', 'build', '-t', image_name, image_path]
     if dockerfile_path:
@@ -130,6 +149,9 @@ def build_image(image_path, image_name, build_args=None, dockerfile_path=None):
     for k, v in (build_args or {}).items():
         cmd += ['--build-arg', '{}={}'.format(k, v)]
     check_call(cmd)
+    for alias in image_aliases:
+        check_call(['docker', 'tag', image_name, alias])
+
 
 @lru_cache()
 def docker_client():
@@ -192,7 +214,7 @@ def image_needs_building(image):
     return image_needs_pushing(image)
 
 
-def build_images(prefix, images, tag=None, commit_range=None, push=False, chart_version=None, skip_build=False):
+def build_images(prefix, images, tag=None, commit_range=None, push=False, chart_version=None, skip_build=False, tag_prefix="", tag_latest=False):
     """Build a collection of docker images
 
     Args:
@@ -213,6 +235,10 @@ def build_images(prefix, images, tag=None, commit_range=None, push=False, chart_
         if `tag` is not specified.
     skip_build (bool):
         Whether to skip the actual image build (only updates tags).
+    tag_prefix (str):
+        An optional prefix on all image tags (in front of chart_version or tag)
+    tag_latest (bool):
+        Whether to also tag images with the latest tag
     """
     value_modifications = {}
     for name, options in images.items():
@@ -228,7 +254,12 @@ def build_images(prefix, images, tag=None, commit_range=None, push=False, chart_
             else:
                 image_tag = last_commit
         image_name = prefix + name
+        image_tag = tag_prefix + image_tag
         image_spec = '{}:{}'.format(image_name, image_tag)
+
+        image_aliases = []
+        if tag_latest:
+            image_aliases = ['{}:latest'.format(image_name)]
 
         value_modifications[options['valuesPath']] = {
             'repository': image_name,
@@ -245,7 +276,7 @@ def build_images(prefix, images, tag=None, commit_range=None, push=False, chart_
 
         if tag or image_needs_building(image_spec):
             build_args = render_build_args(options, template_namespace)
-            build_image(image_path, image_spec, build_args, options.get('dockerfilePath'))
+            build_image(image_path, image_spec, build_args, options.get('dockerfilePath'), image_aliases)
         else:
             print(f"Skipping build for {image_spec}, it already exists")
 
@@ -254,6 +285,8 @@ def build_images(prefix, images, tag=None, commit_range=None, push=False, chart_
                 check_call([
                     'docker', 'push', image_spec
                 ])
+                for alias in image_aliases:
+                    check_call(['docker', 'push', alias])
             else:
                 print(f"Skipping push for {image_spec}, already on registry")
     return value_modifications
@@ -295,7 +328,7 @@ def build_values(name, values_mods):
         yaml.dump(values, f)
 
 
-def build_chart(name, version=None, paths=None, reset=False):
+def build_chart(name, version=None, paths=None, reset=False, release=False):
     """Update chart with specified version or last-modified commit in path(s)"""
     chart_file = os.path.join(name, 'Chart.yaml')
     with open(chart_file) as f:
@@ -308,6 +341,8 @@ def build_chart(name, version=None, paths=None, reset=False):
 
         if reset:
             version = chart['version'].split('-')[0]
+        elif release:
+            version = chart['version']
         else:
             version = chart['version'].split('-')[0] + '-' + commit
 
@@ -324,11 +359,10 @@ def publish_pages(name, paths, git_repo, published_repo, extra_message=''):
     version = last_modified_commit(*paths)
     checkout_dir = '{}-{}'.format(name, version)
     check_call([
-        'git', 'clone', '--no-checkout',
-        git_remote(git_repo), checkout_dir],
-        echo=False,
-    )
-    check_call(['git', 'checkout', 'gh-pages'], cwd=checkout_dir)
+        'git', 'clone', '-b', 'gh-pages',
+        git_remote(git_repo), checkout_dir])
+
+    check_call(['helm', 'dependency', 'update', name])
 
     # package the latest version into a temporary directory
     # and run helm repo index with --merge to update index.yaml
@@ -363,7 +397,7 @@ def publish_pages(name, paths, git_repo, published_repo, extra_message=''):
         '-m', '[{}] Automatic update for commit {}{}'.format(name, version, extra_message)
     ], cwd=checkout_dir)
     check_call(
-        ['git', 'push', 'origin', 'gh-pages'],
+        ['git', 'push', 'origin', 'HEAD:gh-pages'],
         cwd=checkout_dir,
     )
 
@@ -380,6 +414,12 @@ def main():
         help='Publish updated chart to gh-pages')
     argparser.add_argument('--tag', default=None,
         help='Use this tag for images & charts')
+    argparser.add_argument('--tag-latest', action='store_true',
+        help='Also tag Docker images with latest tag')
+    argparser.add_argument('--git-release', action='store_true',
+        help='Only run if no matching git tag, use the unmodified chart version, git tag repository. Handle charts independently.')
+    argparser.add_argument('--git-push', action='store_true',
+        help='If a git tag was created push it.')
     argparser.add_argument('--extra-message', default='',
         help='Extra message to add to the commit message when publishing charts')
     argparser.add_argument('--image-prefix', default=None,
@@ -394,6 +434,10 @@ def main():
     with open('chartpress.yaml') as f:
         config = yaml.load(f)
 
+    if args.git_release:
+        git_tags = list_git_tags()
+        git_tags_to_create = set()
+
     for chart in config['charts']:
         chart_paths = ['.'] + list(chart.get('paths', []))
 
@@ -402,19 +446,35 @@ def main():
             # version of the chart shouldn't have leading 'v' prefix
             # if tag is of the form 'v1.2.3'
             version = version.lstrip('v')
-        chart_version = build_chart(chart['name'], paths=chart_paths, version=version, reset=args.reset)
+        chart_version = build_chart(chart['name'], paths=chart_paths, version=version, reset=args.reset, release=args.git_release)
+        expected_tag = '{}{}'.format(chart.get('gitTagPrefix', ''), chart_version)
+
+        if args.git_release:
+            # Only build and publish if this version hasn't been git tagged
+            if expected_tag in git_tags:
+                print(f"Git tag {expected_tag} already exists, skipping chart {chart['name']}")
+                continue
+            else:
+                git_tags_to_create.add(expected_tag)
 
         if 'images' in chart:
             image_prefix = args.image_prefix if args.image_prefix is not None else chart['imagePrefix']
+            tag = args.tag
+            if args.git_release:
+                tag = chart_version
+            elif args.reset:
+                tag = chart.get('resetTag', 'set-by-chartpress'),
             value_mods = build_images(
                 prefix=image_prefix,
                 images=chart['images'],
-                tag=args.tag if not args.reset else chart.get('resetTag', 'set-by-chartpress'),
+                tag=tag,
                 commit_range=args.commit_range,
                 push=args.push,
                 # exclude `-<hash>` from chart_version prefix for images
                 chart_version=chart_version.split('-', 1)[0],
                 skip_build=args.skip_build or args.reset,
+                tag_prefix=chart.get('imageTagPrefix', ''),
+                tag_latest=args.tag_latest,
             )
             build_values(chart['name'], value_mods)
 
@@ -425,6 +485,21 @@ def main():
                 published_repo=chart['repo']['published'],
                 extra_message=args.extra_message,
             )
+
+    if args.git_release and git_tags_to_create:
+        # Tag as the last step after everything else succeeded
+        modified = check_output(['git', 'diff' ,'HEAD']).strip()
+        if modified:
+            # Don't modify current branch
+            current = check_output(['git', 'rev-parse', 'HEAD']).decode().strip()
+            check_call(['git', 'checkout', current])
+            msg = '[{}] Automatic update for tag'.format(
+                ','.join(git_tags_to_create))
+            check_call(['git', 'commit', '-am', msg])
+        for tag in git_tags_to_create:
+            check_call(['git', 'tag', tag])
+            if args.git_push:
+                check_call(['git', 'push', 'origin', tag])
 
 
 if __name__ == '__main__':
