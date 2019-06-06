@@ -11,6 +11,7 @@ install:
   - ./ci/install.sh
 script:
   - ./ci/test.sh
+#  - ./ci/travis-script.sh
 
 env:
   matrix:
