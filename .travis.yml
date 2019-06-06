@@ -1,6 +1,7 @@
 dist: xenial
 language: python
 git:
+  # chartpress may fail with shallow clones
   depth: false
 services:
   - docker

@@ -3,8 +3,17 @@ charts:
     repo:
       git: manics/omero-helm-chart
       published: https://manics.github.io/omero-helm-chart
+    imagePrefix: manics/omero-k8s-
+    imageTagPrefix: 5.4.10-
+    gitTagPrefix: server-
+    images:
+      server:
+        valuesPath: image
+        buildArgs:
+          OMERO_SERVER_VERSION: 5.4.10
 
   - name: omero-web
     repo:
       git: manics/omero-helm-chart
       published: https://manics.github.io/omero-helm-chart
+    gitTagPrefix: web-
