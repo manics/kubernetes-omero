@@ -1,5 +1,7 @@
 # Kubernetes OMERO
 
+[![Build Status](https://travis-ci.com/manics/kubernetes-omero.svg?branch=master)](https://travis-ci.com/manics/kubernetes-omero)
+
 Kubernetes Helm charts for [OMERO](https://www.openmicroscopy.org/).
 
 Install dependencies:
