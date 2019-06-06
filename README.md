@@ -27,3 +27,12 @@ Get the OMERO.server 4064 external port mapping:
 For the full set of configuration options see
 - [omero-server/values.yaml](omero-server/values.yaml)
 - [omero-web/values.yaml](omero-web/values.yaml)
+
+
+## Storage volumes
+
+You can define existing PersistentVolumeClaims to use for PostgreSQL and OMERO.server data storage.
+
+Alternatively PersistentVolumes can be automatically created using dynamic provisioning if supported by your cluster.
+These volumes will *not* be deleted by `helm delete` to reduce the likehood of inadvertent data loss, and will be reused if the chart is re-installed.
+You must delete the PVCs manually if you want a fresh installation.
