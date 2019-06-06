@@ -1,0 +1,16 @@
+dist: xenial
+language: python
+git:
+  depth: false
+services:
+  - docker
+install:
+#  - pip3 install --no-cache-dir -r dev-requirements.txt
+  - . "ci/minikube-${SCENARIO}.env"
+  - ./ci/install.sh
+script:
+  - ./ci/test.sh
+
+env:
+  matrix:
+    - SCENARIO=1.14-default

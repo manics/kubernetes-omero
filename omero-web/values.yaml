@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: registry.gitlab.com/openmicroscopy/incubator/omero-py-alpine/omero-webapps
-  tag: 5.4.9-1
+  repository: openmicroscopy/omero-web-standalone
+  tag: 5.4
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -19,6 +19,9 @@ config:
   append: []
   appendJson: []
 
+securityContext:
+  enabled: true
+  runAsUser: 998
 
 service:
   type: ClusterIP
@@ -61,7 +64,5 @@ redis:
   enabled: true
   # TODO: Use the augenerated redis secret instead
   password: ChAnGeMe
-  master.:
-    persistence:
-      # Session storage only
-      enabled: false
+  cluster:
+    enabled: false
