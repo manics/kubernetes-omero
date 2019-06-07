@@ -1,2 +1,4 @@
 # https://github.com/jupyterhub/chartpress
 chartpress==0.3.1
+pytest
+requests
