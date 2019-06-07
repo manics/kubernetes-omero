@@ -6,7 +6,7 @@
 # Example:
 # $ vagrant up
 # $ vagrant ssh
-# vagrant$ cd /zero-to-jupyterhub-k8s
+# vagrant$ cd /kubernetes-omero
 # vagrant$ ./ci/vagrant-run.sh
 
 Vagrant.configure("2") do |config|

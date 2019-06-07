@@ -25,6 +25,7 @@ bin/minikube config set WantReportErrorPrompt false
 
 echo "starting minikube with RBAC"
 sudo CHANGE_MINIKUBE_NONE_USER=true $PWD/bin/minikube start $MINIKUBE_ARGS
+sudo $PWD/bin/minikube addons enable ingress
 minikube update-context
 
 # If using CNI the node will not be NotReady until a CNI config exists
