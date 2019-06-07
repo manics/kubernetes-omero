@@ -1,0 +1,10 @@
+charts:
+  - name: omero-server
+    repo:
+      git: manics/omero-helm-chart
+      published: https://manics.github.io/omero-helm-chart
+
+  - name: omero-web
+    repo:
+      git: manics/omero-helm-chart
+      published: https://manics.github.io/omero-helm-chart
