@@ -8,6 +8,15 @@ fold_end() {
   echo -e "\ntravis_fold:end:$1\r"
 }
 
+# kubectl seems to frequently loose its connection on Travis, auto-retry once
+kubectl_retry() {
+  kubectl "$@" || {
+    >&2 echo "kubectl failed, retrying..."
+    sleep 3
+    kubectl "$@"
+  }
+}
+
 set -eux
 
 # Is there a standard interface name?
@@ -36,24 +45,24 @@ helm install --name omero-web --namespace $TEST_NAMESPACE ./omero-web/ \
 
 echo "waiting for omero-server"
 n=0
-until [ "`kubectl -n $TEST_NAMESPACE get statefulset omero-server -o jsonpath='{.status.readyReplicas}'`" = 1 ]; do
+until [ "`kubectl_retry -n $TEST_NAMESPACE get statefulset omero-server -o jsonpath='{.status.readyReplicas}'`" = 1 ]; do
   let ++n
   if [ $(( $n % 12 )) -eq 0 ]; then
-    kubectl -n $TEST_NAMESPACE describe pod
+    kubectl_retry -n $TEST_NAMESPACE describe pod
   else
-    kubectl -n $TEST_NAMESPACE get pod
+    kubectl_retry -n $TEST_NAMESPACE get pod
   fi
   sleep 10
 done
 
 echo "waiting for omero-web"
 n=0
-until [ "`kubectl -n $TEST_NAMESPACE get deploy omero-web -o jsonpath='{.status.readyReplicas}'`" = 1 ]; do
+until [ "`kubectl_retry -n $TEST_NAMESPACE get deploy omero-web -o jsonpath='{.status.readyReplicas}'`" = 1 ]; do
   let ++n
   if [ $(( $n % 12 )) -eq 0 ]; then
-    kubectl -n $TEST_NAMESPACE describe pod
+    kubectl_retry -n $TEST_NAMESPACE describe pod
   else
-    kubectl -n $TEST_NAMESPACE get pod
+    kubectl_retry -n $TEST_NAMESPACE get pod
   fi
   sleep 10
 done
@@ -64,17 +73,17 @@ display_logs() {
   #echo "***** minikube *****"
   #minikube logs
   echo "***** node *****"
-  kubectl describe node
+  kubectl_retry describe node
   echo "***** pods *****"
-  kubectl --namespace $TEST_NAMESPACE get pods
+  kubectl_retry --namespace $TEST_NAMESPACE get pods
   echo "***** events *****"
-  kubectl --namespace $TEST_NAMESPACE get events
+  kubectl_retry --namespace $TEST_NAMESPACE get events
   echo "***** hub *****"
-  kubectl --namespace $TEST_NAMESPACE logs statefulset/omero-server
+  kubectl_retry --namespace $TEST_NAMESPACE logs statefulset/omero-server
   echo "***** proxy *****"
-  kubectl --namespace $TEST_NAMESPACE logs deploy/omero-web
+  kubectl_retry --namespace $TEST_NAMESPACE logs deploy/omero-web
   fold_end logs.1
 }
 
 display_logs
-kubectl --namespace $TEST_NAMESPACE get pods
+kubectl_retry --namespace $TEST_NAMESPACE get pods
