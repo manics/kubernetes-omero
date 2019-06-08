@@ -1,17 +1,10 @@
 #!/bin/bash
 set -eux
 
-python3 tools/templates/lint-and-validate.py
-# render & publish chart
-if [[
-    "$TRAVIS_BRANCH" == "master" &&
-    "$TRAVIS_PULL_REQUEST" == "false" &&
-    "$RUN_PUBLISH_SCRIPT" == "1"
-]]; then
-    ./ci/publish-chart.sh
-else
-    chartpress --commit-range ${TRAVIS_COMMIT_RANGE}
-fi
+helm lint omero-server
+helm lint omero-web
+
+chartpress
 git diff
 
 ./ci/test.sh
