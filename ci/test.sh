@@ -56,9 +56,9 @@ TEST_NAMESPACE=omero-test
 helm dependency update ./omero-server/
 helm dependency update ./omero-web/
 
-helm install --name omero-server --namespace $TEST_NAMESPACE ./omero-server/ \
+helm upgrade --install omero-server --namespace $TEST_NAMESPACE ./omero-server/ \
   -f minikube-omero-server.yaml $HELM_EXTRA_ARGS
-helm install --name omero-web --namespace $TEST_NAMESPACE ./omero-web/ \
+helm upgrade --install omero-web --namespace $TEST_NAMESPACE ./omero-web/ \
   -f minikube-omero-web.yaml $HELM_EXTRA_ARGS
 
 fold_start deploy.1 "Waiting for servers to be ready"
