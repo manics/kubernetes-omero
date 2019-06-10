@@ -1,8 +1,7 @@
 #!/bin/bash
 set -eux
 
-helm lint omero-server
-helm lint omero-web
+helm lint omero-server omero-web
 
 chartpress
 git diff

@@ -10,7 +10,8 @@ install:
   - . "ci/minikube-${SCENARIO}.env"
   - ./ci/install.sh
 script:
-  - ./ci/travis-script.sh
+  - ./ci/build.sh
+  - travis_retry ./ci/test.sh
 
 env:
   matrix:
