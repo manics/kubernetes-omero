@@ -8,3 +8,4 @@ pip3 install --no-cache-dir -r dev-requirements.txt
 . ./ci/minikube-${SCENARIO}.env
 ./ci/install.sh
 ./ci/test.sh
+#./ci/travis-script.sh

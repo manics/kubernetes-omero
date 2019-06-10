@@ -1,6 +1,7 @@
 dist: xenial
 language: python
 git:
+  # chartpress may fail with shallow clones
   depth: false
 services:
   - docker
@@ -9,7 +10,7 @@ install:
   - . "ci/minikube-${SCENARIO}.env"
   - ./ci/install.sh
 script:
-  - ./ci/test.sh
+  - ./ci/travis-script.sh
 
 env:
   matrix:

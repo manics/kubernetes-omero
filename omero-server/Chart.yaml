@@ -3,3 +3,4 @@ appVersion: 5.4.10
 description: OMERO.server
 name: omero-server
 version: 0.2.0
+icon: https://www.openmicroscopy.org/img/logos/omero-logomark.svg
