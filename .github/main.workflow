@@ -1,6 +1,6 @@
 workflow "Publish chart" {
   on = "push"
-  resolves = ["manics/chartpress@devel"]
+  resolves = ["Chartpress"]
 }
 
 action "Master only" {
@@ -25,7 +25,7 @@ action "Docker login" {
   secrets = ["DOCKER_USERNAME", "DOCKER_PASSWORD"]
 }
 
-action "manics/chartpress@devel" {
+action "Chartpress" {
   uses = "manics/chartpress@devel"
   needs = ["Docker login"]
   args = "--git-release --tag-latest --push --publish-chart --git-push"
