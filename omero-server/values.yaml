@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: manics/omero-server-k8s
-  tag: "5.4"
+  repository: manics/omero-k8s-server
+  tag: latest
   pullPolicy: IfNotPresent
 
 nameOverride: ""
