@@ -1,8 +1,8 @@
 charts:
   - name: omero-server
     repo:
-      git: manics/omero-helm-chart
-      published: https://manics.github.io/omero-helm-chart
+      git: manics/kubernetes-omero
+      published: https://manics.github.io/kubernetes-omero
     imagePrefix: manics/omero-k8s-
     imageTagPrefix: 5.4.10-
     gitTagPrefix: server-
@@ -14,6 +14,6 @@ charts:
 
   - name: omero-web
     repo:
-      git: manics/omero-helm-chart
-      published: https://manics.github.io/omero-helm-chart
+      git: manics/kubernetes-omero
+      published: https://manics.github.io/kubernetes-omero
     gitTagPrefix: web-
