@@ -1,5 +1,3 @@
-# https://github.com/jupyterhub/chartpress
-# https://github.com/manics/chartpress/tree/devel
-https://github.com/manics/chartpress/archive/devel.zip
+https://github.com/manics/chartpress/archive/0.3.1-ghaction.0.zip
 pytest
 requests
