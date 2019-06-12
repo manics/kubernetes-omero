@@ -42,6 +42,9 @@ You must delete the PVCs manually if you want a fresh installation.
 
 ## Release process
 
+Tags and Docker images are automatically pushed when the Chart.yaml versions are changed.
+Charts are versioned independently. GitHub tags are prefixed with the component name.
+
 See:
 - [`.github/main.workflow`](.github/main.workflow)
 - [`.travis.yml`](.travis.yml)
