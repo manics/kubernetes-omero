@@ -15,7 +15,7 @@ action "Not deleted" {
 }
 
 action "Wait for Travis" {
-  uses = "manics/test-actions/wait-for-travis@master"
+  uses = "manics/github-actions/wait-for-travis@0.0.1"
   needs = ["Not deleted"]
 }
 
@@ -26,7 +26,7 @@ action "Docker login" {
 }
 
 action "Chartpress" {
-  uses = "manics/chartpress@devel"
+  uses = "manics/chartpress@0.3.1-ghaction.0"
   needs = ["Docker login"]
   args = "--git-release --tag-latest --push --publish-chart --git-push"
   secrets = ["GITHUB_TOKEN"]
