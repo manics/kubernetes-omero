@@ -1,5 +1,5 @@
 # https://github.com/jupyterhub/chartpress
 # https://github.com/manics/chartpress/tree/devel
-https://github.com/manics/chartpress/archive/f36ce14a94ef9ec1b40fae5d8705d69cb48f35ea.zip
+https://github.com/manics/chartpress/archive/devel.zip
 pytest
 requests
