@@ -1,5 +1,8 @@
 prefix: /
 serverList:
+  # Change the first element to match the OMERO.server service name if needed,
+  # E.g. xxx-omero-server
+  # run `kubectl get svc`
   - [omero-server, 4064, omero-server]
 config:
   set:
