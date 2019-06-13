@@ -1,3 +1,5 @@
 title: OMERO Kubernetes Helm Charts
 description: Helm chart repository for OMERO.
 
+
+theme: jekyll-theme-minimal
