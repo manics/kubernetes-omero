@@ -12,6 +12,7 @@ install:
 script:
   - ./ci/build.sh
   - travis_retry ./ci/test.sh
+  - echo "${SCENARIO} completed"
 
 env:
   matrix:
