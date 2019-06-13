@@ -40,7 +40,7 @@ spec:
             {{- if .Values.databaseHost }}
               value: {{ .Values.databaseHost }}
             {{- else }}
-              value: {{ include "omero-server.name" . }}-postgresql
+              value: {{ .Release.Name }}-postgresql
             {{- end }}
             - name: CONFIG_omero_db_name
               value: {{ .Values.postgresql.postgresqlDatabase }}
