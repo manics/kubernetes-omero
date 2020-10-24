@@ -5,9 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: manics/omero-k8s-server
-  # Don't modify this tag for a release, it will be automatically set in the tag commit only
-  tag: latest
+  repository: openmicroscopy/omero-server
+  tag: 5.6.3
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -49,11 +48,11 @@ resources: {}
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   # limits:
-  #  cpu: 100m
-  #  memory: 128Mi
+  #  cpu: 4000m
+  #  memory: 32768Mi
   # requests:
-  #  cpu: 100m
-  #  memory: 128Mi
+  #  cpu: 1000m
+  #  memory: 2048Mi
 
 nodeSelector: {}
 
@@ -64,7 +63,7 @@ affinity: {}
 
 postgresql:
   enabled: true
-  # See https://github.com/kubernetes/charts/tree/master/stable/postgresql#configuration
+  # See https://github.com/bitnami/charts/tree/master/bitnami/postgresql#parameters
   image:
     tag: "10"
   postgresqlUsername: omero
