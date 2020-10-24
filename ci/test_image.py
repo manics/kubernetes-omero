@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
+import os
 import requests
 import urllib3
 
 IMAGE_ID = 1
 IMAGE_NAME = 'opengraph-repo-image.jpg'
 IMAGE_OWNER = 'root'
+SERVER = os.getenv('SERVER', 'https://localhost')
 USERNAME = 'root'
 PASSWORD = 'omero'
 
@@ -14,10 +16,10 @@ def test_image():
     # Disable SSL warnings
     urllib3.disable_warnings()
     session = requests.Session()
-    r = session.get('https://localhost', verify=False)
+    r = session.get(f'{SERVER}', verify=False)
     r.raise_for_status()
 
-    r = session.post('https://localhost/webclient/login/', data={
+    r = session.post(f'{SERVER}/webclient/login/', data={
         'username': USERNAME,
         'password': PASSWORD,
         'csrfmiddlewaretoken': session.cookies['csrftoken'],
@@ -27,7 +29,7 @@ def test_image():
     r.raise_for_status()
     assert r.text == 'OK'
 
-    r = session.get('https://localhost/api/v0/m/images/{}'.format(IMAGE_ID))
+    r = session.get(f'{SERVER}/api/v0/m/images/{IMAGE_ID}')
     r.raise_for_status()
     im = r.json()
 
