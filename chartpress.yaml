@@ -4,14 +4,14 @@ charts:
     repo:
       git: manics/kubernetes-omero
       published: https://manics.github.io/kubernetes-omero
-    # imagePrefix: manics/omero-k8s-
-    # imageTagPrefix: 5.6.3-
+    imagePrefix: manics/omero-k8s-
+    imageTagPrefix: 5.6.3-
     gitTagPrefix: server-
-    # images:
-    #   server:
-    #     valuesPath: image
-    #     buildArgs:
-    #       OMERO_SERVER_VERSION: 5.6.3
+    images:
+      server:
+        valuesPath: image
+        buildArgs:
+          OMERO_SERVER_VERSION: 5.6.3
 
   - name: omero-web
     repo:

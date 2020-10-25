@@ -19,6 +19,18 @@ spec:
       name: ice-srouter
     {{- if and (contains "NodePort" .Values.service.type) .Values.service.nodePort }}
       nodePort: {{ .Values.service.nodePort }}
+    {{- end }}
+    {{- if .Values.websockets.enabled }}
+    - port: {{ .Values.service.wssport }}
+      targetPort: omero-wss
+      protocol: TCP
+      name: omero-wss
+    {{- if not .Values.websockets.encrypted }}
+    - port: {{ .Values.service.wsport }}
+      targetPort: omero-ws
+      protocol: TCP
+      name: omero-ws
+    {{- end }}
     {{- end}}
   {{- if .Values.service.affinity.enabled }}
   sessionAffinity: ClientIP

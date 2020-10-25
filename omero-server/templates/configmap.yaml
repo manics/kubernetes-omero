@@ -5,6 +5,16 @@ metadata:
 data:
 
   server.omero: |
+    {{- if .Values.certificates.enabled }}
+      certificates
+    {{- end }}
+
+    {{- if .Values.websockets.enabled }}
+      config set -- omero.client.icetransports ssl,wss{{ if not .Values.websockets.encrypted }},ws{{- end }}
+    {{- else }}
+      config set -- omero.client.icetransports ssl
+    {{- end }}
+
     {{- range $key, $value := .Values.config.set }}
     config set -- {{ $key }} {{ $value }}
     {{- end }}

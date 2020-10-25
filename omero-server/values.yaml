@@ -5,8 +5,10 @@
 replicaCount: 1
 
 image:
-  repository: openmicroscopy/omero-server
-  tag: 5.6.3
+  repository: manics/omero-k8s-server
+  # Don't modify this tag for a release, it will be automatically set in the
+  # tag commit only
+  tag: latest
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -17,6 +19,20 @@ defaultRootPassword: ChAnGeMe
 config:
   set: {}
   append: []
+
+certificates:
+  # Generate self-signed SSL certificates with the omero-certificates plugin
+  enabled: true
+
+websockets:
+  enabled: false
+  # If true secure websockets (wss) are always enabled. If you are using an
+  # ingress with wss it must support self-signed certificates for
+  # ingress -> pod communication
+  # Otherwise set this to false to also enable plain websockets (ws) for
+  # ingress traffic
+  encrypted: true
+  path: /omero-ws
 
 securityContext:
   enabled: true
@@ -36,11 +52,26 @@ persistence:
 service:
   type: ClusterIP
   port: 4064
+  wsport: 4065
+  wssport: 4066
   # Optionally set an existing IP for type: LoadBalancer
   loadBalancerIP:
   affinity:
     enabled: true
     clientTimeout: 3600
+
+# Only used for omero-wss
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

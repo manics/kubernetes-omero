@@ -91,6 +91,8 @@ echo "Importing image"
 OMERO_PORT=$(kubectl -n $TEST_NAMESPACE get svc omero-server -o jsonpath='{.spec.ports[0].nodePort}')
 IMAGE_ID=$(docker run --rm -v $PWD:/data:ro --entrypoint /opt/omero/server/OMERO.server/bin/omero openmicroscopy/omero-server:latest \
   import -s root@$IP:$OMERO_PORT -w omero -T Dataset:name:test /data/ci/opengraph-repo-image.jpg --encrypted true)
+IMAGE_IDWS=$(docker run --rm -v $PWD:/data:ro --entrypoint /opt/omero/server/OMERO.server/bin/omero openmicroscopy/omero-server:latest \
+  import -s wss://$IP/omero-ws -u root -w omero -T Dataset:name:testws /data/ci/opengraph-repo-image.jpg --encrypted true)
 
 SERVER="https://localhost" pytest ci/test_image.py
 
