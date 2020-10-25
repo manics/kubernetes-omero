@@ -12,9 +12,6 @@ jobs:
     name: Test OMERO Helm charts
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'
       - id: k3s
         uses: manics/action-k3s-helm@v0.2
         with:
@@ -23,7 +20,10 @@ jobs:
           docker-enabled: true
         # This action should export KUBECONFIG
       - name: Install dependencies
-        run: python -m pip install -r dev-requirements.txt
+        run: |
+          conda install -y -q -c ome omero-py pytest
+          $CONDA/bin/pip install -r dev-requirements.txt
+          echo "$CONDA/bin" >> $GITHUB_PATH
       - name: Build
         run: ./ci/build.sh
       - name: Test
