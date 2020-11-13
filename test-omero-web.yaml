@@ -12,10 +12,10 @@ config:
 ingress:
   enabled: true
   hosts:
-    # Get IP from `minikube ip`, Add `.xip.io` since bare IPs aren't supported
-    - 192.168.99.100.xip.io
+    # If you only have an IP add `.xip.io` since bare IPs aren't supported
+    # - 192.168.99.100.xip.io
     - localhost
   tls:
   - hosts:
-    - 192.168.99.100.xip.io
+    # - 192.168.99.100.xip.io
     - localhost
