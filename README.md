@@ -17,9 +17,8 @@ You can use [`test-omero-server.yaml`](test-omero-server.yaml) and [`test-omero-
 
 Install OMERO.server and OMERO.web
 
-    helm install --name omeroserver omero/omero-server -f test-omero-server.yaml
-    helm install --name omeroweb omero/omero-web -f test-omero-web.yaml
-
+    helm upgrade --install omero-server omero/omero-server -f test-omero-server.yaml
+    helm upgrade --install omero-web omero/omero-web -f test-omero-web.yaml
 
 For the full set of configuration options see
 - [omero-server/values.yaml](omero-server/values.yaml)
