@@ -3,7 +3,7 @@ set -eux
 
 helm lint omero-server omero-web
 
-chartpress
+./ci/chartpress.py
 git diff
 
 ./ci/test.sh

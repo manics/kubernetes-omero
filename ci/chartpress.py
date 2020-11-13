@@ -54,9 +54,8 @@ __version__ = '0.3.2.dev'
 
 # name of the environment variable with GitHub token
 GITHUB_TOKEN_KEY = 'GITHUB_TOKEN'
-# name of the environment variable indicating whether this is inside a
-# GitHub action
-GITHUB_ACTION_KEY = 'GITHUB_ACTION'
+# name of the environment variable with GitHub user
+GITHUB_ACTOR_KEY = 'GITHUB_ACTOR'
 
 # name of possible repository keys used in image value
 IMAGE_REPOSITORY_KEYS = {'name', 'repository'}
@@ -83,15 +82,11 @@ def git_remote(git_repo):
 
     Depending on the system setup it returns ssh or https remote.
     """
-    github_action = os.getenv(GITHUB_ACTION_KEY)
     github_token = os.getenv(GITHUB_TOKEN_KEY)
-    if github_action:
-        # GITHUB_TOKEN is set but is used differently inside an Action
-        return 'https://github.com/{0}{1}'.format(
-            git_repo, '.git' if not git_repo.endswith('.git') else '')
+    github_actor = os.getenv(GITHUB_ACTOR_KEY, '')
     if github_token:
-        return 'https://{0}@github.com/{1}'.format(
-            github_token, git_repo)
+        repo = git_repo + ('' if git_repo.endswith('.git') else '.git')
+        return f'https://{github_actor}:{github_token}@github.com/{repo}'
     return 'git@github.com:{0}'.format(git_repo)
 
 
@@ -386,12 +381,12 @@ def build_chart(name, version=None, paths=None, reset=False, release=False):
     return version
 
 
-def publish_pages(name, paths, git_repo, published_repo, extra_message=''):
+def publish_pages(name, paths, git_repo, published_repo, branch, extra_message=''):
     """Publish helm chart index to github pages"""
     version = last_modified_commit(*paths)
     checkout_dir = '{}-{}'.format(name, version)
     check_call([
-        'git', 'clone', '-b', 'gh-pages',
+        'git', 'clone', '-b', branch,
         git_remote(git_repo), checkout_dir])
 
     check_call(['helm', 'dependency', 'update', name])
@@ -429,7 +424,7 @@ def publish_pages(name, paths, git_repo, published_repo, extra_message=''):
         '-m', '[{}] Automatic update for commit {}{}'.format(name, version, extra_message)
     ], cwd=checkout_dir)
     check_call(
-        ['git', 'push', 'origin', 'HEAD:gh-pages'],
+        ['git', 'push', 'origin', f'HEAD:{branch}'],
         cwd=checkout_dir,
     )
 
@@ -443,7 +438,9 @@ def main():
     argparser.add_argument('--push', action='store_true',
         help='Push built images to docker hub')
     argparser.add_argument('--publish-chart', action='store_true',
-        help='Publish updated chart to gh-pages')
+        help='Publish updated chart to branch (publish-branch)')
+    argparser.add_argument('--publish-branch', default='gh-pages',
+        help='Publish updated chart to this branch')
     argparser.add_argument('--tag', default=None,
         help='Use this tag for images & charts')
     argparser.add_argument('--tag-latest', action='store_true',
@@ -515,6 +512,7 @@ def main():
                 paths=chart_paths,
                 git_repo=chart['repo']['git'],
                 published_repo=chart['repo']['published'],
+                branch=args.publish_branch,
                 extra_message=args.extra_message,
             )
 
