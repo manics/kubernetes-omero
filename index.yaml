@@ -2,6 +2,21 @@ apiVersion: v1
 entries:
   omero-server:
   - apiVersion: v1
+    appVersion: 5.6.3
+    created: "2020-11-13T22:42:55.513651905Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 9.8.6
+    description: OMERO.server
+    digest: bc1da9958e0dd6517ba463b2868d94d55ca23ebd6b1d633505eb077008fdf71f
+    icon: https://www.openmicroscopy.org/img/logos/omero-logomark.svg
+    name: omero-server
+    urls:
+    - https://manics.github.io/kubernetes-omero/omero-server-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v1
     appVersion: 5.4.10
     created: "2019-06-13T17:07:48.496480336Z"
     description: OMERO.server
@@ -32,4 +47,4 @@ entries:
     urls:
     - https://manics.github.io/kubernetes-omero/omero-web-0.2.0.tgz
     version: 0.2.0
-generated: "2019-06-13T17:07:48.493985556Z"
+generated: "2020-11-13T22:42:55.508319368Z"
