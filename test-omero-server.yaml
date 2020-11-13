@@ -3,6 +3,10 @@ config:
   set: {}
   append: []
 
+websockets:
+  enabled: true
+  encrypted: false
+
 service:
   type: NodePort
 
@@ -19,3 +23,14 @@ resources:
   requests:
     cpu: 250m
     memory: 2Gi
+
+ingress:
+  enabled: true
+  hosts:
+    # If you only have an IP add `.xip.io` since bare IPs aren't supported
+    # - 192.168.99.100.xip.io
+    - localhost
+  tls:
+  - hosts:
+    # - 192.168.99.100.xip.io
+    - localhost

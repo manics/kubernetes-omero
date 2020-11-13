@@ -59,8 +59,18 @@ spec:
             #   containerPort: 4063
             #   protocol: TCP
             - name: ice-srouter
-              containerPort: 4064
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
+            {{- if .Values.websockets.enabled }}
+            - name: omero-wss
+              containerPort: {{ .Values.service.wssport }}
+              protocol: TCP
+            {{- if not .Values.websockets.encrypted }}
+            - name: omero-ws
+              containerPort: {{ .Values.service.wsport }}
+              protocol: TCP
+            {{- end }}
+            {{- end }}
           livenessProbe:
             # Make this more lenient than readiness probe because failure
             # will restart the pod
@@ -69,7 +79,21 @@ spec:
                 - /opt/omero/server/OMERO.server/bin/omero
                 - admin
                 - status
-            initialDelaySeconds: 300
+            initialDelaySeconds: 60
+            periodSeconds: 60
+            timeoutSeconds: 15
+            # Allow enough time for pod to start
+            # With k8s 1.18 we could switch to a startupProbe probe instead
+            # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+            # failureThreshold: 5
+            failureThreshold: 10
+          startupProbe:
+            exec:
+              command:
+                - /opt/omero/server/OMERO.server/bin/omero
+                - admin
+                - status
+            initialDelaySeconds: 60
             periodSeconds: 60
             timeoutSeconds: 15
             failureThreshold: 5

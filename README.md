@@ -1,6 +1,6 @@
 # Kubernetes OMERO
 
-[![Build Status](https://travis-ci.com/manics/kubernetes-omero.svg?branch=master)](https://travis-ci.com/manics/kubernetes-omero)
+[![CI Status](https://github.com/manics/kubernetes-omero/workflows/Test%20and%20Publish/badge.svg)](https://github.com/manics/kubernetes-omero/actions?query=branch%3Amaster)
 
 Kubernetes Helm charts for [OMERO](https://www.openmicroscopy.org/).
 
@@ -13,12 +13,12 @@ Add the OMERO Helm chart repository:
     helm repo update
 
 Optionally create your OMERO.server and OMERO.web Helm configuration files.
-You can use [`minikube-omero-server.yaml`](minikube-omero-server.yaml) and [`minikube-omero-web.yaml`](minikube-omero-web.yaml) as examples.
+You can use [`test-omero-server.yaml`](test-omero-server.yaml) and [`test-omero-web.yaml`](test-omero-web.yaml) as examples.
 
 Install OMERO.server and OMERO.web
 
-    helm install --name omeroserver omero/omero-server -f minikube-omero-server.yaml
-    helm install --name omeroweb omero/omero-web -f minikube-omero-web.yaml
+    helm install --name omeroserver omero/omero-server -f test-omero-server.yaml
+    helm install --name omeroweb omero/omero-web -f test-omero-web.yaml
 
 
 For the full set of configuration options see
@@ -46,22 +46,23 @@ Install chart dependencies:
     helm dependency update omero-server/
     helm dependency update omero-web/
 
-Install a test server on Minikube (assumes your Minikube has the default ingress and dynamic hostpath volumes enabled):
+Install a test server on K3S (assumes the default ingress and dynamic local volumes are enabled):
 
-    helm upgrade --install omero-server --namespace omero ./omero-server -f minikube-omero-server.yaml
-    helm upgrade --install omero-web --namespace omero ./omero-web -f minikube-omero-web.yaml
+    helm upgrade --install omero-server ./omero-server -f test-omero-server.yaml
+    helm upgrade --install omero-web ./omero-web -f test-omero-web.yaml
 
 Wait for all pods to be ready:
 
-    kubectl -n omero get pods
+    kubectl get pods
 
-Optionally check omero-server logs:
+Optionally check logs:
 
-    kubectl -n omero logs -f deploy/omero-server-omero-server
+    kubectl logs -f statefulset/omero-server
+    kubectl logs -f deploy/omero-web
 
 Get the OMERO.server 4064 external port mapping:
 
-    kubectl -n omero get svc omero-server -o jsonpath='{.spec.ports[0].nodePort}'
+    kubectl get svc omero-server -o jsonpath='{.spec.ports[0].nodePort}'
 
 
 ## Release process
@@ -69,8 +70,7 @@ Get the OMERO.server 4064 external port mapping:
 Tags and Docker images are automatically pushed when the Chart.yaml versions are changed.
 Charts are versioned independently. GitHub tags are prefixed with the component name.
 
-This is all handled using [Chartpress](https://github.com/manics/chartpress/tree/devel).
+This is all handled using [Chartpress](./ci/chartpress.py).
 
 See:
-- [`.github/main.workflow`](.github/main.workflow)
-- [`.travis.yml`](.travis.yml)
+- [`.github/workflows/test.yml`](.github/workflows/test.yml)
