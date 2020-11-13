@@ -1,7 +1,6 @@
 # Kubernetes OMERO
 
-[![Build Status](https://github.com/manics/kubernetes-omero/workflows/Test/badge.svg)](https://github.com/manics/kubernetes-omero/actions?query=branch%3Amaster
-)
+[![CI Status](https://github.com/manics/kubernetes-omero/workflows/Test%20and%20Publish/badge.svg)](https://github.com/manics/kubernetes-omero/actions?query=branch%3Amaster)
 
 Kubernetes Helm charts for [OMERO](https://www.openmicroscopy.org/).
 
@@ -71,7 +70,7 @@ Get the OMERO.server 4064 external port mapping:
 Tags and Docker images are automatically pushed when the Chart.yaml versions are changed.
 Charts are versioned independently. GitHub tags are prefixed with the component name.
 
-This is all handled using [Chartpress](https://github.com/manics/chartpress/tree/devel).
+This is all handled using [Chartpress](./ci/chartpress.py).
 
 See:
 - [`.github/workflows/test.yml`](.github/workflows/test.yml)
