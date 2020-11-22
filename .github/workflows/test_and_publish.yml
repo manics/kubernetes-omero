@@ -12,6 +12,10 @@ jobs:
     name: Test OMERO Helm charts
     steps:
       - uses: actions/checkout@v2
+        with:
+          # chartpress requires the full history
+          fetch-depth: 0
+
       - id: k3s
         uses: manics/action-k3s-helm@v0.2
         with:
@@ -44,6 +48,9 @@ jobs:
     needs: test_omero
     steps:
       - uses: actions/checkout@v2
+        with:
+          # chartpress requires the full history
+          fetch-depth: 0
       - uses: actions/setup-python@v2
         with:
           python-version: '3.8'
