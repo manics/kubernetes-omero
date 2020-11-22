@@ -8,3 +8,7 @@ repos:
     rev: 6.0.1
     hooks:
       - id: beautysh
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.10
+    hooks:
+      - id: helmlint
