@@ -1,5 +1,4 @@
 charts:
-
   - name: omero-server
     repo:
       git: manics/kubernetes-omero

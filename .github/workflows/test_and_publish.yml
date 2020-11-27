@@ -6,6 +6,13 @@ on:
   push:
 
 jobs:
+  precommit:
+    runs-on: ubuntu-latest
+    name: Run pre-commit
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: pre-commit/action@v2.0.0
 
   test_omero:
     runs-on: ubuntu-latest
@@ -45,7 +52,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Publish OMERO Helm charts
     if: github.ref == 'refs/heads/master'
-    needs: test_omero
+    needs:
+      - precommit
+      - test_omero
     steps:
       - uses: actions/checkout@v2
         with:
@@ -53,7 +62,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
+          python-version: "3.8"
       - name: Cache pip
         uses: actions/cache@v2
         with:
