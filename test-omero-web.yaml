@@ -16,6 +16,6 @@ ingress:
     # - 192.168.99.100.xip.io
     - localhost
   tls:
-  - hosts:
-    # - 192.168.99.100.xip.io
-    - localhost
+    - hosts:
+        # - 192.168.99.100.xip.io
+        - localhost
