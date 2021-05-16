@@ -5,10 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: manics/omero-k8s-server
-  # Don't modify this tag for a release, it will be automatically set in the
-  # tag commit only
-  tag: latest
+  repository: openmicroscopy/omero-server
+  tag: 5.6.3-3
   pullPolicy: IfNotPresent
 
 nameOverride: ""
