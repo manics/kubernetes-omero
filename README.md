@@ -1,6 +1,6 @@
 # Kubernetes OMERO
 
-[![CI Status](https://github.com/manics/kubernetes-omero/workflows/Test%20and%20Publish/badge.svg)](https://github.com/manics/kubernetes-omero/actions?query=branch%3Amaster)
+[![CI Status](https://github.com/manics/kubernetes-omero/workflows/Test%20and%20Publish/badge.svg)](https://github.com/manics/kubernetes-omero/actions?query=branch%3Amain)
 
 Kubernetes Helm charts for [OMERO](https://www.openmicroscopy.org/).
 
