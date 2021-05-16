@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
-      - uses: pre-commit/action@v2.0.0
+      - uses: pre-commit/action@v2.0.3
 
   test_omero:
     runs-on: ubuntu-latest
@@ -24,10 +24,10 @@ jobs:
           fetch-depth: 0
 
       - id: k3s
-        uses: manics/action-k3s-helm@v0.2
+        uses: jupyterhub/action-k3s-helm@v1.1.1
         with:
-          k3s-version: v1.19.3+k3s1
-          helm-version: v3.3.4
+          k3s-version: v1.21.0+k3s1
+          helm-version: v3.5.4
           docker-enabled: true
         # This action should export KUBECONFIG
       - name: Cache pip
@@ -50,6 +50,8 @@ jobs:
 
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     name: Publish OMERO Helm charts
     if: github.ref == 'refs/heads/main'
     needs:
@@ -73,7 +75,7 @@ jobs:
             ${{ runner.os }}-
       - uses: azure/setup-helm@v1
         with:
-          version: v3.3.4
+          version: v3.5.4
       - name: Install dependencies
         run: pip install -r dev-requirements.txt
       - uses: docker/login-action@v1
