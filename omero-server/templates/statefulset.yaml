@@ -59,15 +59,15 @@ spec:
             #   containerPort: 4063
             #   protocol: TCP
             - name: ice-srouter
-              containerPort: {{ .Values.service.port }}
+              containerPort: 4064
               protocol: TCP
             {{- if .Values.websockets.enabled }}
             - name: omero-wss
-              containerPort: {{ .Values.service.wssport }}
+              containerPort: 4065
               protocol: TCP
             {{- if not .Values.websockets.encrypted }}
             - name: omero-ws
-              containerPort: {{ .Values.service.wsport }}
+              containerPort: 4066
               protocol: TCP
             {{- end }}
             {{- end }}
