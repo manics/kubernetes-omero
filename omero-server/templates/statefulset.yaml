@@ -63,11 +63,11 @@ spec:
               protocol: TCP
             {{- if .Values.websockets.enabled }}
             - name: omero-wss
-              containerPort: 4065
+              containerPort: 4066
               protocol: TCP
             {{- if not .Values.websockets.encrypted }}
             - name: omero-ws
-              containerPort: 4066
+              containerPort: 4065
               protocol: TCP
             {{- end }}
             {{- end }}
