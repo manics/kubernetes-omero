@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
 
       - id: k3s
-        uses: jupyterhub/action-k3s-helm@v1.1.1
+        uses: jupyterhub/action-k3s-helm@v2.0.0
         with:
           k3s-version: v1.21.0+k3s1
           helm-version: v3.5.4
