@@ -381,7 +381,7 @@ def build_chart(name, version=None, paths=None, reset=False, release=False):
         elif release:
             version = chart["version"]
         else:
-            version = chart["version"].split("-")[0] + "-" + commit
+            version = chart["version"].split("-")[0] + "-h" + commit
 
     chart["version"] = version
 
