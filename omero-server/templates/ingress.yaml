@@ -1,7 +1,8 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "omero-server.fullname" . -}}
 {{- $ingressPath := .Values.websockets.path -}}
-apiVersion: extensions/v1beta1
+# Requires k8s 1.19+
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $fullName }}
@@ -37,9 +38,12 @@ spec:
         paths:
         {{- if $.Values.websockets.enabled }}
           - path: {{ $ingressPath }}
+            pathType: Prefix
             backend:
-              serviceName: {{ $fullName }}
-              servicePort: omero-{{ $.Values.websockets.encrypted | ternary "wss" "ws" }}
+              service:
+                name: {{ $fullName }}
+                port:
+                  name: omero-{{ $.Values.websockets.encrypted | ternary "wss" "ws" }}
         {{- end}}
   {{- end }}
 {{- end }}
