@@ -34,11 +34,28 @@ You must delete the PVCs manually if you want a fresh installation.
 
 ## Breaking changes
 
-### OMERO.web 0.4.0
+### OMERO.server 0.4.0
 
 - Kubernetes 1.19+ is now required.
 
-### OMERO.server 0.4.0
+Version TODO of the omero-server chart updated the PostgreSQL chart to TODO
+Unfortunately the upstream chart [introduced breaking changes](https://docs.bitnami.com/kubernetes/infrastructure/postgresql/administration/upgrade/#upgrading-instructions).
+Please backup your database and follow these instructions to upgrade:
+
+    # Change this to the name of your deployed omero-server chart
+    OMERO_SERVER_NAME=omero-server
+
+    export POSTGRESQL_PASSWORD=$(kubectl get secret ${OMERO_SERVER_NAME}-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode)
+    export POSTGRESQL_PVC=$(kubectl get pvc -l app.kubernetes.io/instance=${OMERO_SERVER_NAME},app.kubernetes.io/name=postgresql,role=master -o jsonpath="{.items[0].metadata.name}")
+
+    kubectl delete statefulsets.apps omero-server-postgresql
+    kubectl delete secret ${OMERO_SERVER_NAME}-postgresql
+
+
+
+    kubectl scale statefulsets omero-server --replicas=0
+
+### OMERO.web 0.4.0
 
 - Kubernetes 1.19+ is now required.
 

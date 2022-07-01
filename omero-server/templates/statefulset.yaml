@@ -43,11 +43,11 @@ spec:
               value: {{ .Release.Name }}-postgresql
             {{- end }}
             - name: CONFIG_omero_db_name
-              value: {{ .Values.postgresql.postgresqlDatabase }}
+              value: {{ coalesce .Values.postgresql.auth.database .Values.postgresql.postgresqlDatabase }}
             - name: CONFIG_omero_db_user
-              value: {{ .Values.postgresql.postgresqlUsername }}
+              value: {{ coalesce .Values.postgresql.auth.username .Values.postgresql.postgresqlUsername }}
             - name: CONFIG_omero_db_pass
-              value: {{ .Values.postgresql.postgresqlPassword }}
+              value: {{ coalesce .Values.postgresql.auth.password .Values.postgresql.postgresqlPassword }}
             # Only used when initialising a new OMERO database
             - name: ROOTPASS
               value: {{ .Values.defaultRootPassword }}

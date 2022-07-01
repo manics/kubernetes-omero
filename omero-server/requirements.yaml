@@ -1,6 +1,7 @@
 dependencies:
+  # https://docs.bitnami.com/kubernetes/infrastructure/postgresql/administration/upgrade/
   - name: postgresql
-    version: 10.16.2
+    version: 11
     # Workaround for old charts being removed from the default index.yaml
     # https://github.com/bitnami/charts/issues/10539
     # repository: https://charts.bitnami.com/bitnami
