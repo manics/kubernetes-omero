@@ -10,15 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     name: Run pre-commit
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - uses: pre-commit/action@v2.0.3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+      - uses: pre-commit/action@v3.0.0
 
   test_omero:
     runs-on: ubuntu-latest
     name: Test OMERO Helm charts
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           # chartpress requires the full history
           fetch-depth: 0
@@ -58,11 +58,11 @@ jobs:
       - precommit
       - test_omero
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           # chartpress requires the full history
           fetch-depth: 0
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.8"
       - name: Cache pip
