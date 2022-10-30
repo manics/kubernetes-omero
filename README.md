@@ -32,6 +32,16 @@ Alternatively PersistentVolumes can be automatically created using dynamic provi
 These volumes will _not_ be deleted by `helm delete` to reduce the likehood of inadvertent data loss, and will be reused if the chart is re-installed.
 You must delete the PVCs manually if you want a fresh installation.
 
+## Breaking changes
+
+### OMERO.web 0.4.0
+
+- Kubernetes 1.19+ is now required.
+
+### OMERO.server 0.4.0
+
+- Kubernetes 1.19+ is now required.
+
 ## Development
 
 Install build dependencies:
