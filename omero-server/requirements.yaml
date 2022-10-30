@@ -1,5 +1,8 @@
 dependencies:
   - name: postgresql
     version: 9.8.6
-    repository: https://charts.bitnami.com/bitnami
+    # Workaround for old charts being removed from the default index.yaml
+    # https://github.com/bitnami/charts/issues/10539
+    # repository: https://charts.bitnami.com/bitnami
+    repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
     condition: postgresql.enabled
