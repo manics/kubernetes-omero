@@ -14,6 +14,12 @@ Add the OMERO Helm chart repository:
 Optionally create your OMERO.server and OMERO.web Helm configuration files.
 You can use [`test-omero-server.yaml`](test-omero-server.yaml) and [`test-omero-web.yaml`](test-omero-web.yaml) as examples.
 
+Create a PostgreSQL database, and add the credentials to your OMERO.server chart configuration file.
+For testing you could use the `bitnami/postgresql` Helm chart:
+
+    helm repo add bitnami https://charts.bitnami.com/bitnami
+    helm upgrade --install postgresql bitnami/postgresql -f test-postgresql.yaml
+
 Install OMERO.server and OMERO.web
 
     helm upgrade --install omero-server omero/omero-server -f test-omero-server.yaml
@@ -36,28 +42,25 @@ You must delete the PVCs manually if you want a fresh installation.
 
 ### OMERO.server 0.4.0
 
-- Kubernetes 1.19+ is now required.
+- PostgreSQL is no longer automatically deployed due to the complexity of managing major version upgrades.
+  You are strongly recommended to deploy a PostgreSQL server separately, for example:
 
-Version TODO of the omero-server chart updated the PostgreSQL chart to TODO
-Unfortunately the upstream chart [introduced breaking changes](https://docs.bitnami.com/kubernetes/infrastructure/postgresql/administration/upgrade/#upgrading-instructions).
-Please backup your database and follow these instructions to upgrade:
+  - using a Helm chart such as [bitnami/postgresql](https://artifacthub.io/packages/helm/bitnami/postgresql)
+  - using an operator such as
 
-    # Change this to the name of your deployed omero-server chart
-    OMERO_SERVER_NAME=omero-server
+    - [CloudNativePG](https://github.com/cloudnative-pg/cloudnative-pg)
+    - [Postgres Operator from Zalondo](https://github.com/zalando/postgres-operator)
+    - [PGO from Crunchy Data](https://access.crunchydata.com/documentation/postgres-operator/)
 
-    export POSTGRESQL_PASSWORD=$(kubectl get secret ${OMERO_SERVER_NAME}-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode)
-    export POSTGRESQL_PVC=$(kubectl get pvc -l app.kubernetes.io/instance=${OMERO_SERVER_NAME},app.kubernetes.io/name=postgresql,role=master -o jsonpath="{.items[0].metadata.name}")
+    which generally provide better support for major PostgreSQL upgrades
 
-    kubectl delete statefulsets.apps omero-server-postgresql
-    kubectl delete secret ${OMERO_SERVER_NAME}-postgresql
+  - using a managed service such as [Amazon RDS](https://aws.amazon.com/rds/postgresql/) or [Google Cloud SQL](https://cloud.google.com/sql/docs/postgres)
 
-
-
-    kubectl scale statefulsets omero-server --replicas=0
+- Kubernetes 1.19+ is required.
 
 ### OMERO.web 0.4.0
 
-- Kubernetes 1.19+ is now required.
+- Kubernetes 1.19+ is required.
 
 ## Development
 

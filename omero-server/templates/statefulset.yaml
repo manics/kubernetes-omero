@@ -37,17 +37,13 @@ spec:
           # In openmicroscopy/omero-server these CONFIG envvars have higher
           # precedence than .omero config files
             - name: CONFIG_omero_db_host
-            {{- if .Values.databaseHost }}
-              value: {{ .Values.databaseHost }}
-            {{- else }}
-              value: {{ .Release.Name }}-postgresql
-            {{- end }}
+              value: {{ .Values.database.host }}
             - name: CONFIG_omero_db_name
-              value: {{ coalesce .Values.postgresql.auth.database .Values.postgresql.postgresqlDatabase }}
+              value: {{ .Values.database.name }}
             - name: CONFIG_omero_db_user
-              value: {{ coalesce .Values.postgresql.auth.username .Values.postgresql.postgresqlUsername }}
+              value: {{ .Values.database.username }}
             - name: CONFIG_omero_db_pass
-              value: {{ coalesce .Values.postgresql.auth.password .Values.postgresql.postgresqlPassword }}
+              value: {{ .Values.database.password }}
             # Only used when initialising a new OMERO database
             - name: ROOTPASS
               value: {{ .Values.defaultRootPassword }}
