@@ -8,6 +8,7 @@ on:
 jobs:
   precommit:
     runs-on: ubuntu-latest
+    timeout-minutes: 2
     name: Run pre-commit
     steps:
       - uses: actions/checkout@v3
@@ -16,6 +17,7 @@ jobs:
 
   test_omero:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     name: Test OMERO Helm charts
     strategy:
       matrix:

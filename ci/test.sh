@@ -50,6 +50,8 @@ helm upgrade --install omero-web --namespace $TEST_NAMESPACE --create-namespace 
 
 fold_start "waiting for omero-server"
 n=0
+# Built-in bash timer
+SECONDS=0
 until [ "`kubectl_retry -n $TEST_NAMESPACE get statefulset omero-server -o jsonpath='{.status.readyReplicas}'`" = 1 ]; do
     let ++n
     if [ $(( $n % 12 )) -eq 0 ]; then
@@ -57,18 +59,30 @@ until [ "`kubectl_retry -n $TEST_NAMESPACE get statefulset omero-server -o jsonp
     else
         kubectl_retry -n $TEST_NAMESPACE get pod
     fi
+    if [ $SECONDS -gt 600 ]; then
+        echo "Failed to start OMERO.server after $SECONDS s, exiting"
+        display_logs
+        exit 1
+    fi
     sleep 10
 done
 fold_end
 
 fold_start "waiting for omero-web"
 n=0
+# Built-in bash timer
+SECONDS=0
 until [ "`kubectl_retry -n $TEST_NAMESPACE get deploy omero-web -o jsonpath='{.status.readyReplicas}'`" = 1 ]; do
     let ++n
     if [ $(( $n % 12 )) -eq 0 ]; then
         kubectl_retry -n $TEST_NAMESPACE describe pod
     else
         kubectl_retry -n $TEST_NAMESPACE get pod
+    fi
+    if [ $SECONDS -gt 300 ]; then
+        echo "Failed to start OMERO.web after $SECONDS s, exiting"
+        display_logs
+        exit 1
     fi
     sleep 10
 done
