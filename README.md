@@ -56,11 +56,11 @@ You must delete the PVCs manually if you want a fresh installation.
 
   - using a managed service such as [Amazon RDS](https://aws.amazon.com/rds/postgresql/) or [Google Cloud SQL](https://cloud.google.com/sql/docs/postgres)
 
-- Kubernetes 1.19+ is required.
+- Kubernetes 1.21+ is required.
 
 ### OMERO.web 0.4.0
 
-- Kubernetes 1.19+ is required.
+- Kubernetes 1.21+ is required.
 
 ## Development
 
