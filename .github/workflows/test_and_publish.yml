@@ -51,6 +51,20 @@ jobs:
       - name: Test
         run: ./ci/test.sh
 
+  # This job can be used as a required status for Pull Requests
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    name: Status
+    needs:
+      - precommit
+      - test_omero
+    steps:
+      - name: Status
+        run: |
+          echo "precommit: ${{ needs.precommit.result }}"
+          echo "test_omero: ${{ needs.test_omero.result }}"
+
   publish:
     runs-on: ubuntu-latest
     permissions:
