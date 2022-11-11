@@ -5,5 +5,3 @@ helm lint omero-server omero-web
 
 ./ci/chartpress.py
 git diff
-
-./ci/test.sh

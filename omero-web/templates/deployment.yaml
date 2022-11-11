@@ -45,9 +45,11 @@ spec:
           resources:
 {{ toYaml .Values.resources | indent 12 }}
           volumeMounts:
+          {{- if .Values.config.defaultWebapps }}
             - name: omero-web-config
               mountPath: /opt/omero/web/config/01-default-webapps.omero
               subPath: 01-default-webapps.omero
+          {{- end }}
             - name: omero-web-config
               mountPath: /opt/omero/web/config/web.omero
               subPath: web.omero

@@ -14,6 +14,12 @@ Add the OMERO Helm chart repository:
 Optionally create your OMERO.server and OMERO.web Helm configuration files.
 You can use [`test-omero-server.yaml`](test-omero-server.yaml) and [`test-omero-web.yaml`](test-omero-web.yaml) as examples.
 
+Create a PostgreSQL database, and add the credentials to your OMERO.server chart configuration file.
+For testing you could use the `bitnami/postgresql` Helm chart:
+
+    helm repo add bitnami https://charts.bitnami.com/bitnami
+    helm upgrade --install postgresql bitnami/postgresql -f test-postgresql.yaml
+
 Install OMERO.server and OMERO.web
 
     helm upgrade --install omero-server omero/omero-server -f test-omero-server.yaml
@@ -31,6 +37,30 @@ You can define existing PersistentVolumeClaims to use for PostgreSQL and OMERO.s
 Alternatively PersistentVolumes can be automatically created using dynamic provisioning if supported by your cluster.
 These volumes will _not_ be deleted by `helm delete` to reduce the likehood of inadvertent data loss, and will be reused if the chart is re-installed.
 You must delete the PVCs manually if you want a fresh installation.
+
+## Breaking changes
+
+### OMERO.server 0.4.0
+
+- PostgreSQL is no longer automatically deployed due to the complexity of managing major version upgrades.
+  You are strongly recommended to deploy a PostgreSQL server separately, for example:
+
+  - using a Helm chart such as [bitnami/postgresql](https://artifacthub.io/packages/helm/bitnami/postgresql)
+  - using an operator such as
+
+    - [CloudNativePG](https://github.com/cloudnative-pg/cloudnative-pg)
+    - [Postgres Operator from Zalondo](https://github.com/zalando/postgres-operator)
+    - [PGO from Crunchy Data](https://access.crunchydata.com/documentation/postgres-operator/)
+
+    which generally provide better support for major PostgreSQL upgrades
+
+  - using a managed service such as [Amazon RDS](https://aws.amazon.com/rds/postgresql/) or [Google Cloud SQL](https://cloud.google.com/sql/docs/postgres)
+
+- Kubernetes 1.21+ is required.
+
+### OMERO.web 0.4.0
+
+- Kubernetes 1.21+ is required.
 
 ## Development
 

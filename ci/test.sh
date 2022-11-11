@@ -18,16 +18,13 @@ kubectl_retry() {
 }
 
 display_logs() {
-    fold_start "Display kubernetes logs"
-    # May crash on Travis:
-    #echo "***** minikube *****"
-    #minikube logs
+    fold_start "Display kubernetes resources"
     echo "***** node *****"
     kubectl_retry describe node
-    echo "***** pods *****"
-    kubectl_retry --namespace $TEST_NAMESPACE get pods
-    echo "***** events *****"
-    kubectl_retry --namespace $TEST_NAMESPACE get events
+    for obj in daemonset deployment statefulset pods service ingress pv pvc events; do
+        echo "***** $obj *****"
+        kubectl_retry --namespace $TEST_NAMESPACE get "$obj"
+    done
     echo "***** hub *****"
     kubectl_retry --namespace $TEST_NAMESPACE logs statefulset/omero-server
     echo "***** proxy *****"
@@ -37,32 +34,24 @@ display_logs() {
 
 set -eux
 
-# Is there a standard interface name?
-for iface in eth0 ens4 enp0s3; do
-    IP=$(ip -o -4 addr show $iface | awk '{print $4}' | cut -d/ -f1);
-    if [ -n "$IP" ]; then
-        echo "IP: $IP"
-        break
-    fi
-done
-if [ -z "$IP" ]; then
-    echo "Failed to get IP, current interfaces:"
-    ifconfig -a
-    exit 2
-fi
+IP=$(hostname -I | awk '{print $1}')
 
 TEST_NAMESPACE=omero-test
 
-helm dependency update ./omero-server/
-helm dependency update ./omero-web/
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm upgrade --install postgresql --namespace $TEST_NAMESPACE --create-namespace bitnami/postgresql -f test-postgresql.yaml
 
 helm upgrade --install omero-server --namespace $TEST_NAMESPACE --create-namespace \
     ./omero-server/ -f test-omero-server.yaml
+
+helm dependency update ./omero-web/
 helm upgrade --install omero-web --namespace $TEST_NAMESPACE --create-namespace \
     ./omero-web/ -f test-omero-web.yaml
 
 fold_start "waiting for omero-server"
 n=0
+# Built-in bash timer
+SECONDS=0
 until [ "`kubectl_retry -n $TEST_NAMESPACE get statefulset omero-server -o jsonpath='{.status.readyReplicas}'`" = 1 ]; do
     let ++n
     if [ $(( $n % 12 )) -eq 0 ]; then
@@ -70,18 +59,30 @@ until [ "`kubectl_retry -n $TEST_NAMESPACE get statefulset omero-server -o jsonp
     else
         kubectl_retry -n $TEST_NAMESPACE get pod
     fi
+    if [ $SECONDS -gt 600 ]; then
+        echo "Failed to start OMERO.server after $SECONDS s, exiting"
+        display_logs
+        exit 1
+    fi
     sleep 10
 done
 fold_end
 
 fold_start "waiting for omero-web"
 n=0
+# Built-in bash timer
+SECONDS=0
 until [ "`kubectl_retry -n $TEST_NAMESPACE get deploy omero-web -o jsonpath='{.status.readyReplicas}'`" = 1 ]; do
     let ++n
     if [ $(( $n % 12 )) -eq 0 ]; then
         kubectl_retry -n $TEST_NAMESPACE describe pod
     else
         kubectl_retry -n $TEST_NAMESPACE get pod
+    fi
+    if [ $SECONDS -gt 300 ]; then
+        echo "Failed to start OMERO.web after $SECONDS s, exiting"
+        display_logs
+        exit 1
     fi
     sleep 10
 done
@@ -99,4 +100,3 @@ omero logout
 SERVER="https://localhost" pytest ci/test_image.py
 
 display_logs
-kubectl_retry --namespace $TEST_NAMESPACE get pods

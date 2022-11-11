@@ -8,45 +8,62 @@ on:
 jobs:
   precommit:
     runs-on: ubuntu-latest
+    timeout-minutes: 2
     name: Run pre-commit
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - uses: pre-commit/action@v2.0.3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+      - uses: pre-commit/action@v3.0.0
 
   test_omero:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     name: Test OMERO Helm charts
+    strategy:
+      matrix:
+        include:
+          - k3s-version: v1.21.0+k3s1
+            helm-version: v3.5.4
+          - k3s-version: v1.25.3+k3s1
+            helm-version: v3.10.1
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           # chartpress requires the full history
           fetch-depth: 0
 
       - id: k3s
-        uses: jupyterhub/action-k3s-helm@v2.0.0
+        uses: jupyterhub/action-k3s-helm@v3
         with:
-          k3s-version: v1.21.0+k3s1
-          helm-version: v3.5.4
-          docker-enabled: true
+          k3s-version: ${{ matrix.k3s-version }}
+          helm-version: ${{ matrix.helm-version }}
         # This action should export KUBECONFIG
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-            ${{ runner.os }}-
+
       - name: Install dependencies
         run: |
           conda install -y -q -c ome omero-py pytest requests ruamel.yaml docker-py
           # $CONDA/bin/pip install -r dev-requirements.txt
           echo "$CONDA/bin" >> $GITHUB_PATH
+
       - name: Build
         run: ./ci/build.sh
+
       - name: Test
         run: ./ci/test.sh
+
+  # This job can be used as a required status for Pull Requests
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    name: Status
+    needs:
+      - precommit
+      - test_omero
+    steps:
+      - name: Status
+        run: |
+          echo "precommit: ${{ needs.precommit.result }}"
+          echo "test_omero: ${{ needs.test_omero.result }}"
 
   publish:
     runs-on: ubuntu-latest
@@ -58,27 +75,25 @@ jobs:
       - precommit
       - test_omero
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           # chartpress requires the full history
           fetch-depth: 0
-      - uses: actions/setup-python@v2
+
+      - uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-            ${{ runner.os }}-
-      - uses: azure/setup-helm@v1
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: dev-requirements.txt
+
+      - uses: azure/setup-helm@v3
         with:
           version: v3.5.4
+
       - name: Install dependencies
         run: pip install -r dev-requirements.txt
-      - uses: docker/login-action@v1
+
+      - uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}

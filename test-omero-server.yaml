@@ -1,3 +1,9 @@
+database:
+  host: postgresql
+  username: omero
+  password: ChAnGeMe
+  name: omero
+
 defaultRootPassword: omero
 config:
   set: {}

@@ -1,4 +1,4 @@
-1. Get the application URL by running these commands:
+Get the application URL by running these commands:
 {{- if contains "NodePort" .Values.service.type }}
   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "omero-server.fullname" . }})
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
@@ -12,4 +12,33 @@
   export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "omero-server.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
   echo "Visit http://127.0.0.1:8080 to use your application"
   kubectl port-forward $POD_NAME 8080:80
+{{- end }}
+
+{{- /*
+  Breaking changes.
+*/}}
+{{- $breaking := "" }}
+
+{{- if (.Values.postgresql).enabled }}
+{{- $breaking = print $breaking "\n\nPostgreSQL is no longer managed by this chart" }}
+{{- end }}
+
+{{- if .Values.databaseHost }}
+{{- $breaking = print $breaking "\n\ndatabaseHost has been replaced by database.host" }}
+{{- end }}
+
+{{- if (.Values.postgresql).postgresqlUsername }}
+{{- $breaking = print $breaking "\n\npostgresql.postgresqlUsername has been replaced by database.username" }}
+{{- end }}
+
+{{- if (.Values.postgresql).postgresqlPassword }}
+{{- $breaking = print $breaking "\n\npostgresql.postgresqlUsername has been replaced by database.password" }}
+{{- end }}
+
+{{- if (.Values.postgresql).postgresqlDatabase }}
+{{- $breaking = print $breaking "\n\npostgresql.postgresqlUsername has been replaced by database.name" }}
+{{- end }}
+
+{{- if $breaking }}
+{{- fail (print "###########\n ## ERROR ##\n###########\n\n" $breaking "\n\n") }}
 {{- end }}
