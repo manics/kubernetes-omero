@@ -1,4 +1,4 @@
-{{- if .Values.ingress.enabled -}}
+{{- if and .Values.ingress.enabled .Values.websockets.enabled -}}
 {{- $fullName := include "omero-server.fullname" . -}}
 {{- $ingressPath := .Values.websockets.path -}}
 # Requires k8s 1.19+
@@ -11,7 +11,7 @@ metadata:
     helm.sh/chart: {{ include "omero-server.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-  {{- if and .Values.websockets.enabled .Values.websockets.encrypted }}
+  {{- if .Values.websockets.encrypted }}
   annotations:
     ingress.kubernetes.io/protocol: https
   {{- else if .Values.ingress.annotations }}
@@ -32,11 +32,9 @@ spec:
   {{- end }}
 {{- end }}
   rules:
-  {{- range .Values.ingress.hosts }}
-    - host: {{ . | quote }}
-      http:
+  {{- range $host := .Values.ingress.hosts | default (list "") }}
+    - http:
         paths:
-        {{- if $.Values.websockets.enabled }}
           - path: {{ $ingressPath }}
             pathType: Prefix
             backend:
@@ -44,6 +42,8 @@ spec:
                 name: {{ $fullName }}
                 port:
                   name: omero-{{ $.Values.websockets.encrypted | ternary "wss" "ws" }}
-        {{- end}}
+    {{- if $host }}
+      host: {{ $host | quote }}
+    {{- end }}
   {{- end }}
 {{- end }}

@@ -65,15 +65,14 @@ service:
     enabled: true
     clientTimeout: 3600
 
-# Only used for omero-wss
+# Only used for omero websockets
 ingress:
   enabled: false
   annotations:
     {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-  hosts:
-    - chart-example.local
+  hosts: []
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
