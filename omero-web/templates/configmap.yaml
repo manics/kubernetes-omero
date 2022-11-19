@@ -7,14 +7,7 @@ data:
   # Override https://github.com/ome/omero-web-docker/blob/master/standalone/01-default-webapps.omero
 {{- if .Values.config.defaultWebapps }}
   01-default-webapps.omero: |
-    config append -- omero.web.middleware '{"index": 0, "class": "whitenoise.middleware.WhiteNoiseMiddleware"}'
-
-    config append -- omero.web.apps '"omero_iviewer"'
-    config set -- omero.web.viewer.view omero_iviewer.views.index
-    config append -- omero.web.open_with '["omero_iviewer", "omero_iviewer_index", {"supported_objects":["images", "dataset", "well"], "script_url": "omero_iviewer/openwith.js", "label": "OMERO.iviewer"}]'
-
-    config append -- omero.web.apps '"omero_parade"'
-    config append -- omero.web.ui.center_plugins '["Parade", "omero_parade/init.js.html", "omero_parade"]'
+    {{ .Values.config.defaultWebapps | nindent 4 }}
 {{- end }}
 
   web.omero: |
