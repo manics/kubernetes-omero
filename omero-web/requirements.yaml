@@ -1,5 +1,5 @@
 dependencies:
   - name: redis
-    version: 17.3.7
+    version: 17.3.11
     repository: https://charts.bitnami.com/bitnami
     condition: redis.enabled
