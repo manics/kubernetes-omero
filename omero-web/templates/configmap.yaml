@@ -7,18 +7,15 @@ data:
   # Override https://github.com/ome/omero-web-docker/blob/master/standalone/01-default-webapps.omero
 {{- if .Values.config.defaultWebapps }}
   01-default-webapps.omero: |
-    config append -- omero.web.middleware '{"index": 0, "class": "whitenoise.middleware.WhiteNoiseMiddleware"}'
-
-    config append -- omero.web.apps '"omero_iviewer"'
-    config set -- omero.web.viewer.view omero_iviewer.views.index
-    config append -- omero.web.open_with '["omero_iviewer", "omero_iviewer_index", {"supported_objects":["images", "dataset", "well"], "script_url": "omero_iviewer/openwith.js", "label": "OMERO.iviewer"}]'
-
-    config append -- omero.web.apps '"omero_parade"'
-    config append -- omero.web.ui.center_plugins '["Parade", "omero_parade/init.js.html", "omero_parade"]'
+    {{ .Values.config.defaultWebapps | nindent 4 }}
 {{- end }}
 
   web.omero: |
     config append -- omero.web.django_additional_settings '["LOGGING", {"version": 1, "disable_existing_loggers": false, "formatters": {"standard": {"format": "%(asctime)s %(levelname)5.5s [%(name)40.40s] (proc.%(process)5.5d) %(funcName)s():%(lineno)d %(message)s"}}, "handlers": {"console": {"level": "DEBUG", "class": "logging.StreamHandler", "formatter": "standard"}}, "loggers": {"": {"handlers": ["console"], "level": "DEBUG", "propagate": true}}}]'
+
+    # Workaround bug when prefix set https://github.com/evansd/whitenoise/issues/271
+    config append -- omero.web.django_additional_settings '["WHITENOISE_STATIC_PREFIX", "/static"]'
+
     config set -- omero.web.secure true
     config set -- omero.web.server_list '{{ .Values.serverList | toJson }}'
 

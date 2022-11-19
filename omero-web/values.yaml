@@ -13,7 +13,8 @@ nameOverride: ""
 fullnameOverride: ""
 
 prefix: /
-serverList: '[["omero-server", 4064, "omero"]]'
+serverList:
+  - ["omero-server", 4064, "omero"]
 config:
   # Set to a multiline string (|) to override the default webapps config
   # https://github.com/ome/omero-web-docker/blob/5.14.0-1/standalone/01-default-webapps.omero
@@ -38,8 +39,7 @@ ingress:
     {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-  hosts:
-    - chart-example.local
+  hosts: []
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:

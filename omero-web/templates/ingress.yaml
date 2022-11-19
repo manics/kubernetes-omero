@@ -27,9 +27,8 @@ spec:
   {{- end }}
 {{- end }}
   rules:
-  {{- range .Values.ingress.hosts }}
-    - host: {{ . | quote }}
-      http:
+  {{- range $host := .Values.ingress.hosts | default (list "") }}
+    - http:
         paths:
           - path: {{ $ingressPath }}
             pathType: Prefix
@@ -38,5 +37,8 @@ spec:
                 name: {{ $fullName }}
                 port:
                   name: http
+    {{- if $host }}
+      host: {{ $host | quote }}
+    {{- end }}
   {{- end }}
 {{- end }}
