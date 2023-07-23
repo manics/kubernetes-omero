@@ -41,7 +41,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          conda install -y -q -c ome omero-py pytest requests ruamel.yaml docker-py
+          conda install -y -q -c conda-forge python=3.10 omero-py pytest requests ruamel.yaml docker-py
           # $CONDA/bin/pip install -r dev-requirements.txt
           echo "$CONDA/bin" >> $GITHUB_PATH
 
