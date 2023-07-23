@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: openmicroscopy/omero-server
-  tag: 5.6.6
+  tag: 5.6.7
   pullPolicy: IfNotPresent
 
 nameOverride: ""
