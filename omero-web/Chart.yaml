@@ -1,5 +1,5 @@
 apiVersion: v1
-appVersion: 5.21.0
+appVersion: 5.22.0
 description: OMERO.web
 name: omero-web
 version: 0.4.2
