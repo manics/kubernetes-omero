@@ -1,5 +1,7 @@
 #!/bin/bash
 
+BITNAMI_POSTGRESQL_VERSION=12.6.0
+
 fold_start() {
     echo "::group::$1"
 }
@@ -39,7 +41,7 @@ IP=$(hostname -I | awk '{print $1}')
 TEST_NAMESPACE=omero-test
 
 helm repo add bitnami https://charts.bitnami.com/bitnami
-helm upgrade --install postgresql --namespace $TEST_NAMESPACE --create-namespace bitnami/postgresql -f test-postgresql.yaml
+helm upgrade --install postgresql --namespace $TEST_NAMESPACE --create-namespace bitnami/postgresql  --version $BITNAMI_POSTGRESQL_VERSION -f test-postgresql.yaml
 
 helm upgrade --install omero-server --namespace $TEST_NAMESPACE --create-namespace \
     ./omero-server/ -f test-omero-server.yaml

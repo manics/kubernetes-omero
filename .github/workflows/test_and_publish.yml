@@ -20,12 +20,13 @@ jobs:
     timeout-minutes: 20
     name: Test OMERO Helm charts
     strategy:
+      fail-fast: false
       matrix:
         include:
           - k3s-version: v1.21.0+k3s1
             helm-version: v3.5.4
-          - k3s-version: v1.25.3+k3s1
-            helm-version: v3.10.1
+          - k3s-version: v1.27.3+k3s1
+            helm-version: v3.12.0
     steps:
       - uses: actions/checkout@v3
         with:
@@ -41,7 +42,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          conda install -y -q -c ome omero-py pytest requests ruamel.yaml docker-py
+          conda install -y -q -c conda-forge python=3.10 omero-py pytest requests ruamel.yaml docker-py
           # $CONDA/bin/pip install -r dev-requirements.txt
           echo "$CONDA/bin" >> $GITHUB_PATH
 
