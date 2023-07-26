@@ -1,6 +1,6 @@
 apiVersion: v1
-appVersion: 5.22.0
+appVersion: 5.22.1
 description: OMERO.web
 name: omero-web
-version: 0.4.2
+version: 0.4.3
 icon: https://www.openmicroscopy.org/img/logos/omero-logomark.svg
