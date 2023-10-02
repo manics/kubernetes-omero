@@ -6,7 +6,8 @@ replicaCount: 1
 
 image:
   repository: openmicroscopy/omero-server
-  tag: 5.6.8
+  # Default .Chart.AppVersion
+  tag:
   pullPolicy: IfNotPresent
 
 nameOverride: ""
