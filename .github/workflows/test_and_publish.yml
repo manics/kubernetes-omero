@@ -7,16 +7,16 @@ on:
 
 jobs:
   precommit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 2
     name: Run pre-commit
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
       - uses: pre-commit/action@v3.0.0
 
   test_omero:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 20
     name: Test OMERO Helm charts
     strategy:
@@ -25,16 +25,25 @@ jobs:
         include:
           - k3s-version: v1.21.0+k3s1
             helm-version: v3.5.4
-          - k3s-version: v1.27.3+k3s1
-            helm-version: v3.12.0
+            # v4 supports k3s 1.24+
+            k3s-helm-version: v3
+          - k3s-version: v1.29.1+k3s1
+            helm-version: v3.14.0
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # chartpress requires the full history
           fetch-depth: 0
 
-      - id: k3s
-        uses: jupyterhub/action-k3s-helm@v3
+      - uses: jupyterhub/action-k3s-helm@v3
+        if: matrix.k3s-helm-version == 'v3'
+        with:
+          k3s-version: ${{ matrix.k3s-version }}
+          helm-version: ${{ matrix.helm-version }}
+        # This action should export KUBECONFIG
+
+      - uses: jupyterhub/action-k3s-helm@v4
+        if: matrix.k3s-helm-version != 'v3'
         with:
           k3s-version: ${{ matrix.k3s-version }}
           helm-version: ${{ matrix.helm-version }}
@@ -54,7 +63,7 @@ jobs:
 
   # This job can be used as a required status for Pull Requests
   status:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 2
     name: Status
     needs:
@@ -67,7 +76,7 @@ jobs:
           echo "test_omero: ${{ needs.test_omero.result }}"
 
   publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: write
     name: Publish OMERO Helm charts
@@ -76,12 +85,12 @@ jobs:
       - precommit
       - test_omero
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # chartpress requires the full history
           fetch-depth: 0
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
           cache: pip
@@ -89,12 +98,12 @@ jobs:
 
       - uses: azure/setup-helm@v3
         with:
-          version: v3.5.4
+          version: v3.14.0
 
       - name: Install dependencies
         run: pip install -r dev-requirements.txt
 
-      - uses: docker/login-action@v2
+      - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
