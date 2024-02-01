@@ -31,7 +31,7 @@ spec:
       terminationGracePeriodSeconds: 300
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           # In openmicroscopy/omero-server these CONFIG envvars have higher

@@ -6,7 +6,8 @@ replicaCount: 1
 
 image:
   repository: openmicroscopy/omero-web-standalone
-  tag: 5.22.1
+  # Default .Chart.AppVersion
+  tag:
   pullPolicy: IfNotPresent
 
 nameOverride: ""

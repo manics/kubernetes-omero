@@ -8,7 +8,7 @@ Kubernetes Helm charts for [OMERO](https://www.openmicroscopy.org/).
 
 Add the OMERO Helm chart repository:
 
-    helm repo add omero https://manics.github.io/kubernetes-omero/
+    helm repo add omero https://www.manicstreetpreacher.co.uk/kubernetes-omero/
     helm repo update
 
 Optionally create your OMERO.server and OMERO.web Helm configuration files.
