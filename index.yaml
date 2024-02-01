@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   omero-server:
   - apiVersion: v1
+    appVersion: 5.6.10
+    created: "2024-02-01T21:12:58.503465541Z"
+    description: OMERO.server
+    digest: 8ff6b55a48f0921ea0a4e2bcc249b717728228d7424904ed187abff1b90af6dc
+    icon: https://www.openmicroscopy.org/img/logos/omero-logomark.svg
+    name: omero-server
+    urls:
+    - https://manics.github.io/kubernetes-omero/omero-server-0.4.4.tgz
+    version: 0.4.4
+  - apiVersion: v1
     appVersion: 5.6.8
     created: "2023-07-25T18:23:20.324717086Z"
     description: OMERO.server
@@ -237,4 +247,4 @@ entries:
     urls:
     - https://manics.github.io/kubernetes-omero/omero-web-0.2.0.tgz
     version: 0.2.0
-generated: "2023-07-26T19:15:10.825594543Z"
+generated: "2024-02-01T21:12:58.5029248Z"
