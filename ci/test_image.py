@@ -28,11 +28,12 @@ def test_image():
             "server": 1,
             "noredirect": 1,
         },
+        verify=False,
     )
     r.raise_for_status()
     assert r.text == "OK"
 
-    r = session.get(f"{SERVER}/api/v0/m/images/{IMAGE_ID}")
+    r = session.get(f"{SERVER}/api/v0/m/images/{IMAGE_ID}", verify=False)
     r.raise_for_status()
     im = r.json()
 
