@@ -27,8 +27,8 @@ jobs:
             helm-version: v3.5.4
             # v4 supports k3s 1.24+
             k3s-helm-version: v3
-          - k3s-version: v1.30.3+k3s1
-            helm-version: v3.15.3
+          - k3s-version: v1.31.1+k3s1
+            helm-version: v3.16.2
     steps:
       - uses: actions/checkout@v4
         with:
@@ -96,9 +96,9 @@ jobs:
           cache: pip
           cache-dependency-path: dev-requirements.txt
 
-      - uses: azure/setup-helm@v3
+      - uses: azure/setup-helm@v4
         with:
-          version: v3.14.0
+          version: v3.16.2
 
       - name: Install dependencies
         run: pip install -r dev-requirements.txt
