@@ -19,7 +19,7 @@ database:
   host:
   username: omero
   password: ChAnGeMe
-  database: omero
+  name: omero
 
 defaultRootPassword: ChAnGeMe
 config:
