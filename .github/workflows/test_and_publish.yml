@@ -7,7 +7,7 @@ on:
 
 jobs:
   precommit:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 2
     name: Run pre-commit
     steps:
@@ -16,7 +16,7 @@ jobs:
       - uses: pre-commit/action@v3.0.1
 
   test_omero:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     name: Test OMERO Helm charts
     strategy:
@@ -27,8 +27,8 @@ jobs:
             helm-version: v3.5.4
             # v4 supports k3s 1.24+
             k3s-helm-version: v3
-          - k3s-version: v1.31.1+k3s1
-            helm-version: v3.16.2
+          - k3s-version: v1.32.3+k3s1
+            helm-version: v3.17.2
     steps:
       - uses: actions/checkout@v4
         with:
@@ -51,7 +51,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          conda install -y -q -c conda-forge python=3.10 omero-py pytest requests ruamel.yaml docker-py
+          conda install -y -q -c conda-forge python=3.12 omero-py pytest requests ruamel.yaml docker-py
           # $CONDA/bin/pip install -r dev-requirements.txt
           echo "$CONDA/bin" >> $GITHUB_PATH
 
@@ -63,7 +63,7 @@ jobs:
 
   # This job can be used as a required status for Pull Requests
   status:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 2
     name: Status
     needs:
@@ -76,7 +76,7 @@ jobs:
           echo "test_omero: ${{ needs.test_omero.result }}"
 
   publish:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     name: Publish OMERO Helm charts
@@ -92,13 +92,13 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
           cache: pip
           cache-dependency-path: dev-requirements.txt
 
       - uses: azure/setup-helm@v4
         with:
-          version: v3.16.2
+          version: v3.17.2
 
       - name: Install dependencies
         run: pip install -r dev-requirements.txt
