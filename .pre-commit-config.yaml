@@ -8,6 +8,9 @@ repos:
     rev: v6.2.1
     hooks:
       - id: beautysh
+        # Workaround bug: ModuleNotFoundError: No module named 'pkg_resources'
+        additional_dependencies:
+          - setuptools
   - repo: https://github.com/gruntwork-io/pre-commit
     rev: v0.1.23
     hooks:
