@@ -66,7 +66,7 @@ service:
     enabled: true
     clientTimeout: 3600
 
-# Only used for omero websockets (wegsockets needs to be activated)
+# Only used for omero websockets (not activated by default)
 ingress:
   enabled: false
   # className: "nginx"
