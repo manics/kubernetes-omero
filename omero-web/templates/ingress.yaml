@@ -16,8 +16,8 @@ metadata:
 {{ toYaml . | indent 4 }}
 {{- end }}
 spec:
-{{- if .Values.ingress.className }}
-  ingressClassName: {{ .Values.ingress.className }}
+{{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
 {{- end }}
 {{- if .Values.ingress.tls }}
   tls:
