@@ -203,6 +203,21 @@ entries:
     version: 0.2.0
   omero-web:
   - apiVersion: v1
+    appVersion: 5.29.2
+    created: "2025-08-14T09:36:14.840015048Z"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 17.3.11
+    description: OMERO.web
+    digest: 47a1790355a1ab19c3ff674af14d918d6cd9e68e1745f27a0556539aa6f1ce9e
+    icon: https://www.openmicroscopy.org/img/logos/omero-logomark.svg
+    name: omero-web
+    urls:
+    - https://manics.github.io/kubernetes-omero/omero-web-0.4.10.tgz
+    version: 0.4.10
+  - apiVersion: v1
     appVersion: 5.29.1
     created: "2025-07-02T11:39:29.830920066Z"
     dependencies:
@@ -407,4 +422,4 @@ entries:
     urls:
     - https://manics.github.io/kubernetes-omero/omero-web-0.2.0.tgz
     version: 0.2.0
-generated: "2025-07-02T11:39:29.825791938Z"
+generated: "2025-08-14T09:36:14.835406282Z"
