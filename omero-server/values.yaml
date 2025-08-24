@@ -66,9 +66,10 @@ service:
     enabled: true
     clientTimeout: 3600
 
-# Only used for omero websockets
+# Only used for omero websockets (not activated by default)
 ingress:
   enabled: false
+  # className: "nginx"
   annotations:
     {}
     # kubernetes.io/ingress.class: nginx
