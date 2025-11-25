@@ -36,6 +36,7 @@ display_logs() {
 
 set -eux
 
+fold_start "installing postgresql omero-server omero-web"
 IP=$(hostname -I | awk '{print $1}')
 
 TEST_NAMESPACE=omero-test
@@ -49,6 +50,7 @@ helm upgrade --install omero-server --namespace $TEST_NAMESPACE --create-namespa
 helm dependency update ./omero-web/
 helm upgrade --install omero-web --namespace $TEST_NAMESPACE --create-namespace \
     ./omero-web/ -f test-omero-web.yaml
+fold_end
 
 fold_start "waiting for omero-server"
 n=0
@@ -90,7 +92,10 @@ until [ "`kubectl_retry -n $TEST_NAMESPACE get deploy omero-web -o jsonpath='{.s
 done
 fold_end
 
-echo "Importing image"
+# Display logs if tests fail
+trap display_logs EXIT
+
+fold_start "importing image"
 OMERO_PORT=$(kubectl -n $TEST_NAMESPACE get svc omero-server -o jsonpath='{.spec.ports[0].nodePort}')
 omero login -s root@localhost:$OMERO_PORT -w omero
 omero import -T Dataset:name:test ci/opengraph-repo-image.jpg
@@ -98,7 +103,10 @@ omero logout
 omero login -s wss://localhost/omero-ws -u root -w omero
 omero import -T Dataset:name:testws ci/opengraph-repo-image.jpg
 omero logout
+fold_end
 
+fold_start "pytest"
 SERVER="https://localhost" pytest ci/test_image.py
+fold_end
 
 display_logs
