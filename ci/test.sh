@@ -1,8 +1,10 @@
 #!/bin/bash
 
-# Can update when we drop older K8s versions
-# CNPG_VERSION=1.28.1
-CNPG_VERSION=1.15.1
+# https://cloudnative-pg.io/docs/1.28/supported_releases#support-status-of-cloudnativepg-releases
+CNPG_VERSION=1.28.1
+
+f_green="\n\033[32;1m%s\033[0m\n"
+f_red="\n\033[31;1m%s\033[0m\n"
 
 fold_start() {
     echo "::group::$1"
@@ -15,7 +17,7 @@ fold_end() {
 # kubectl seems to frequently loose its connection on Travis, auto-retry once
 kubectl_retry() {
     kubectl "$@" || {
-        >&2 echo "kubectl failed, retrying..."
+        >&2 printf "$f_red" "kubectl failed, retrying..."
         sleep 3
         kubectl "$@"
     }
@@ -23,22 +25,39 @@ kubectl_retry() {
 
 display_logs() {
     fold_start "Display kubernetes resources"
-    echo "***** node *****"
+
+    printf "$f_green" "***** node *****"
+
     kubectl_retry describe node
     for obj in daemonset deployment statefulset pods service ingress pv pvc events; do
-        echo "***** $obj *****"
+        printf "$f_green" "***** $obj *****"
         kubectl_retry --namespace $TEST_NAMESPACE get "$obj"
     done
-    echo "***** hub *****"
+    for crd in cluster; do
+        printf "$f_green" "***** crd: $crd *****"
+        kubectl_retry --namespace $TEST_NAMESPACE get "$crd"
+    done
+
+    printf "$f_green" "***** logs: omero-server *****"
     kubectl_retry --namespace $TEST_NAMESPACE logs statefulset/omero-server
-    echo "***** proxy *****"
+
+    printf "$f_green" "***** logs: omero-web *****"
     kubectl_retry --namespace $TEST_NAMESPACE logs deploy/omero-web
+
+    printf "$f_green" "***** logs: cnpg-controller-manager *****"
+    kubectl_retry --namespace cnpg-system logs deploy/cnpg-controller-manager
+
     fold_end
 }
 
 set -eux
 
 fold_start "installing postgresql"
+
+if [ $(kubectl version -ojson | jq -r '.serverVersion | "\(.major).\(.minor)"') == 1.21 ]; then
+    CNPG_VERSION=1.15.1
+fi
+
 IP=$(hostname -I | awk '{print $1}')
 
 TEST_NAMESPACE=omero-test
@@ -72,7 +91,7 @@ until [ "`kubectl_retry -n $TEST_NAMESPACE get statefulset omero-server -o jsonp
         kubectl_retry -n $TEST_NAMESPACE get pod
     fi
     if [ $SECONDS -gt 600 ]; then
-        echo "Failed to start OMERO.server after $SECONDS s, exiting"
+        printf "$f_red" "Failed to start OMERO.server after $SECONDS s, exiting"
         display_logs
         exit 1
     fi
@@ -92,7 +111,7 @@ until [ "`kubectl_retry -n $TEST_NAMESPACE get deploy omero-web -o jsonpath='{.s
         kubectl_retry -n $TEST_NAMESPACE get pod
     fi
     if [ $SECONDS -gt 300 ]; then
-        echo "Failed to start OMERO.web after $SECONDS s, exiting"
+        printf "$f_red" "Failed to start OMERO.web after $SECONDS s, exiting"
         display_logs
         exit 1
     fi
