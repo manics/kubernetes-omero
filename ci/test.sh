@@ -1,6 +1,8 @@
 #!/bin/bash
 
-BITNAMI_POSTGRESQL_VERSION=12.6.0
+# Can update when we drop older K8s versions
+# CNPG_VERSION=1.28.1
+CNPG_VERSION=1.15.1
 
 fold_start() {
     echo "::group::$1"
@@ -36,13 +38,19 @@ display_logs() {
 
 set -eux
 
-fold_start "installing postgresql omero-server omero-web"
+fold_start "installing postgresql"
 IP=$(hostname -I | awk '{print $1}')
 
 TEST_NAMESPACE=omero-test
 
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm upgrade --install postgresql --namespace $TEST_NAMESPACE --create-namespace bitnami/postgresql  --version $BITNAMI_POSTGRESQL_VERSION -f test-postgresql.yaml
+kubectl create namespace $TEST_NAMESPACE
+
+kubectl apply --server-side=true -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/releases/cnpg-${CNPG_VERSION}.yaml
+kubectl -ncnpg-system rollout status deploy cnpg-controller-manager --timeout=300s
+kubectl apply --namespace $TEST_NAMESPACE -f test-postgresql.yaml
+fold_end
+
+fold_start "installing omero-server omero-web"
 
 helm upgrade --install omero-server --namespace $TEST_NAMESPACE --create-namespace \
     ./omero-server/ -f test-omero-server.yaml

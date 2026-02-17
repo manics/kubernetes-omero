@@ -15,10 +15,10 @@ Optionally create your OMERO.server and OMERO.web Helm configuration files.
 You can use [`test-omero-server.yaml`](test-omero-server.yaml) and [`test-omero-web.yaml`](test-omero-web.yaml) as examples.
 
 Create a PostgreSQL database, and add the credentials to your OMERO.server chart configuration file.
-For testing you could use the `bitnami/postgresql` Helm chart:
+For testing you can use the [CloudNativePG](https://cloudnative-pg.io/) operator:
 
-    helm repo add bitnami https://charts.bitnami.com/bitnami
-    helm upgrade --install postgresql bitnami/postgresql -f test-postgresql.yaml
+    kubectl apply --server-side=true -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/releases/cnpg-1.28.1.yaml
+    kubectl apply -f test-postgresql.yaml
 
 Install OMERO.server and OMERO.web
 
@@ -44,14 +44,10 @@ You must delete the PVCs manually if you want a fresh installation.
 
 - PostgreSQL is no longer automatically deployed due to the complexity of managing major version upgrades.
   You are strongly recommended to deploy a PostgreSQL server separately, for example:
-  - using a Helm chart such as [bitnami/postgresql](https://artifacthub.io/packages/helm/bitnami/postgresql)
   - using an operator such as
     - [CloudNativePG](https://github.com/cloudnative-pg/cloudnative-pg)
     - [Postgres Operator from Zalondo](https://github.com/zalando/postgres-operator)
     - [PGO from Crunchy Data](https://access.crunchydata.com/documentation/postgres-operator/)
-
-    which generally provide better support for major PostgreSQL upgrades
-
   - using a managed service such as [Amazon RDS](https://aws.amazon.com/rds/postgresql/) or [Google Cloud SQL](https://cloud.google.com/sql/docs/postgres)
 
 - Kubernetes 1.21+ is required.
