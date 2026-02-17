@@ -44,10 +44,8 @@ You must delete the PVCs manually if you want a fresh installation.
 
 - PostgreSQL is no longer automatically deployed due to the complexity of managing major version upgrades.
   You are strongly recommended to deploy a PostgreSQL server separately, for example:
-
   - using a Helm chart such as [bitnami/postgresql](https://artifacthub.io/packages/helm/bitnami/postgresql)
   - using an operator such as
-
     - [CloudNativePG](https://github.com/cloudnative-pg/cloudnative-pg)
     - [Postgres Operator from Zalondo](https://github.com/zalando/postgres-operator)
     - [PGO from Crunchy Data](https://access.crunchydata.com/documentation/postgres-operator/)
