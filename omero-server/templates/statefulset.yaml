@@ -29,6 +29,18 @@ spec:
         runAsUser: {{ .Values.securityContext.runAsUser }}
       {{- end }}
       terminationGracePeriodSeconds: 300
+      initContainers:
+        # var/tmp isn't automatically created leading to a failure
+        # https://github.com/ome/openmicroscopy/issues/6448
+        - name: mkdirs
+          image: docker.io/library/busybox:1.37
+          command:
+            - mkdir
+            - -p
+            - /opt/omero/server/OMERO.server/var/tmp
+          volumeMounts:
+            - name: omero-server-var
+              mountPath: /opt/omero/server/OMERO.server/var
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
