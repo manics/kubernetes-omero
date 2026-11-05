@@ -17,7 +17,7 @@ You can use [`test-omero-server.yaml`](test-omero-server.yaml) and [`test-omero-
 Create a PostgreSQL database, and add the credentials to your OMERO.server chart configuration file.
 For testing you can use the [CloudNativePG](https://cloudnative-pg.io/) operator:
 
-    kubectl apply --server-side=true -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/releases/cnpg-1.28.1.yaml
+    kubectl apply --server-side=true -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/releases/cnpg-1.30.1.yaml
     kubectl apply -f test-postgresql.yaml
 
 Install OMERO.server and OMERO.web
