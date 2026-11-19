@@ -18,7 +18,6 @@
         "openmicroscopy/omero-web-standalone"
       ],
       "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:-(?<build>\\d+))?$",
-      "schedule": ["at 6:00am every day"],
       "bumpVersions": [
         {
           "name": "Bump Helm chart version",
