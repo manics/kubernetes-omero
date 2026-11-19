@@ -98,7 +98,7 @@ jobs:
 
       - uses: azure/setup-helm@v4
         with:
-          version: v3.17.2
+          version: v3.22.1
 
       - name: Install dependencies
         run: pip install -r dev-requirements.txt
