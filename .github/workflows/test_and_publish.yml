@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 2
     name: Run pre-commit
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v5
       - uses: pre-commit/action@v3.0.1
 
@@ -30,7 +30,7 @@ jobs:
           - k3s-version: v1.32.3+k3s1
             helm-version: v3.17.2
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # chartpress requires the full history
           fetch-depth: 0
@@ -85,7 +85,7 @@ jobs:
       - precommit
       - test_omero
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # chartpress requires the full history
           fetch-depth: 0
