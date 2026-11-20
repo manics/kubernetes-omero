@@ -96,7 +96,7 @@ jobs:
           cache: pip
           cache-dependency-path: dev-requirements.txt
 
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@v5
         with:
           version: v3.22.1
 
