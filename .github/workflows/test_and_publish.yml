@@ -7,7 +7,7 @@ on:
 
 jobs:
   precommit:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 2
     name: Run pre-commit
     steps:
@@ -15,7 +15,7 @@ jobs:
       - uses: j178/prek-action@v3.1.1
 
   test_omero:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 20
     name: Test OMERO Helm charts
     strategy:
@@ -62,7 +62,7 @@ jobs:
 
   # This job can be used as a required status for Pull Requests
   status:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 2
     name: Status
     needs:
@@ -75,7 +75,7 @@ jobs:
           echo "test_omero: ${{ needs.test_omero.result }}"
 
   publish:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     # `contents: write` allows pushing a tag, but not if the tag includes a
     # change to a workflow. `workflows: write` is available for personal access
     # tokens but not for the temporary GITHUB_TOKEN.
