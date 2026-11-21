@@ -12,8 +12,7 @@ jobs:
     name: Run pre-commit
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v5
-      - uses: pre-commit/action@v3.0.1
+      - uses: j178/prek-action@v3.1.1
 
   test_omero:
     runs-on: ubuntu-24.04
