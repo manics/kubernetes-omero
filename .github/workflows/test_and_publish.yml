@@ -77,8 +77,12 @@ jobs:
 
   publish:
     runs-on: ubuntu-24.04
-    permissions:
-      contents: write
+    # `contents: write` allows pushing a tag, but not if the tag includes a
+    # change to a workflow. `workflows: write` is available for personal access
+    # tokens but not for the temporary GITHUB_TOKEN.
+    # permissions:
+    #   contents: write
+    environment: publish
     name: Publish OMERO Helm charts
     if: github.ref == 'refs/heads/main'
     needs:
@@ -111,7 +115,7 @@ jobs:
       - name: Publish
         run: ./ci/chartpress.py --git-release --tag-latest --push --publish-chart --git-push
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PUSH_TOKEN_GITHUB }}
           # Required for git commit:
           EMAIL: chartpress-bot@example.org
           GIT_AUTHOR_NAME: chartpress-bot
