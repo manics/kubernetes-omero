@@ -1,0 +1,67 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  // Cooldown period: 7 days
+  "minimumReleaseAge": "7 days",
+  "internalChecksFilter": "strict",
+  "enabledManagers": [
+    "custom.regex",
+    "github-actions",
+    "helm-requirements",
+    "pip_requirements",
+    "pre-commit",
+  ],
+  "pre-commit": {
+    "enabled": true,
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/(^|/)Chart\\.yaml$/"],
+      "matchStrings": [
+        "#\\s*renovate:\\s*datasource=(?<datasource>[a-z-]+)\\s+depName=(?<depName>\\S+)\\s*\\n\\s*appVersion:\\s*[\"']?(?<currentValue>[\\w.-]+)[\"']?",
+      ],
+    },
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["github-actions"],
+      // Monthly on the 1st day of the month
+      "schedule": ["* * 1 * *"],
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "github-actions (non-major)",
+    },
+    {
+      "matchManagers": ["pre-commit"],
+      // Monthly on the 1st day of the month
+      "schedule": ["* * 1 * *"],
+    },
+    {
+      "matchManagers": ["pre-commit"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "pre-commit (non-major)",
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": [
+        "openmicroscopy/omero-server",
+        "openmicroscopy/omero-web-standalone",
+      ],
+      "minimumReleaseAge": "0 days",
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:-(?<build>\\d+))?$",
+      "bumpVersions": [
+        {
+          "name": "Bump Helm chart version",
+          "filePatterns": ["{{packageFileDir}}/Chart.yaml"],
+          "matchStrings": [
+            "(?:^|\\n)version:\\s*(?<version>\\d+\\.\\d+\\.\\d+)",
+          ],
+          "bumpType": "patch",
+        },
+      ],
+    },
+  ],
+}
