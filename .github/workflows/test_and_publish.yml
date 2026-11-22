@@ -22,10 +22,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - k3s-version: v1.21.0+k3s1
+          - k3s-version: v1.35.10+k3s1
             helm-version: v3.22.1
-            # v4 supports k3s 1.24+
-            k3s-helm-version: v3
           - k3s-version: v1.37.2+k3s1
             helm-version: v4.3.2
     steps:
@@ -40,15 +38,7 @@ jobs:
           echo kernel.apparmor_restrict_unprivileged_unconfined = 0 | sudo tee /etc/sysctl.d/90-apparmor-container-fix.conf
           sudo sysctl --system
 
-      - uses: jupyterhub/action-k3s-helm@v3
-        if: matrix.k3s-helm-version == 'v3'
-        with:
-          k3s-version: ${{ matrix.k3s-version }}
-          helm-version: ${{ matrix.helm-version }}
-        # This action should export KUBECONFIG
-
       - uses: jupyterhub/action-k3s-helm@v4
-        if: matrix.k3s-helm-version != 'v3'
         with:
           k3s-version: ${{ matrix.k3s-version }}
           helm-version: ${{ matrix.helm-version }}
