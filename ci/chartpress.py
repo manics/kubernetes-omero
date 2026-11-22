@@ -41,7 +41,7 @@ import argparse
 from collections.abc import MutableMapping
 from functools import lru_cache, partial
 import os
-import pipes
+import shlex
 import shutil
 import subprocess
 from tempfile import TemporaryDirectory
@@ -49,8 +49,6 @@ from tempfile import TemporaryDirectory
 import docker
 from ruamel.yaml import YAML
 from ruamel.yaml.scalarstring import SingleQuotedScalarString
-
-__version__ = "0.3.2.dev"
 
 # name of the environment variable with GitHub token
 GITHUB_TOKEN_KEY = "GITHUB_TOKEN"
@@ -69,7 +67,7 @@ yaml.indent(mapping=2, offset=2, sequence=4)
 def run_cmd(call, cmd, *, echo=True, **kwargs):
     """Run a command and echo it first"""
     if echo:
-        print("$> " + " ".join(map(pipes.quote, cmd)))
+        print("$> " + " ".join(map(shlex.quote, cmd)))
     return call(cmd, **kwargs)
 
 
