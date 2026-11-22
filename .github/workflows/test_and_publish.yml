@@ -48,16 +48,26 @@ jobs:
           helm-version: ${{ matrix.helm-version }}
         # This action should export KUBECONFIG
 
-      - name: Install dependencies
-        run: |
-          conda install -y -q -c conda-forge python=3.12 omero-py pytest requests ruamel.yaml docker-py
-          # $CONDA/bin/pip install -r dev-requirements.txt
-          echo "$CONDA/bin" >> $GITHUB_PATH
+      - name: Setup conda environment
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-name: test
+          cache-environment: true
+          init-shell: "none"
+          create-args: >-
+            python=3.14
+            docker-py
+            omero-py
+            pytest
+            requests
+            ruamel.yaml
 
       - name: Build
+        shell: micromamba-shell {0}
         run: ./ci/build.sh
 
       - name: Test
+        shell: micromamba-shell {0}
         run: ./ci/test.sh
 
   # This job can be used as a required status for Pull Requests
