@@ -34,6 +34,12 @@ jobs:
           # chartpress requires the full history
           fetch-depth: 0
 
+      # https://bugs.launchpad.net/ubuntu/+source/linux-oracle/+bug/2172531
+      - name: Workaround AppArmor ContainerD bug
+        run: |
+          echo kernel.apparmor_restrict_unprivileged_unconfined = 0 | sudo tee /etc/sysctl.d/90-apparmor-container-fix.conf
+          sudo sysctl --system
+
       - uses: jupyterhub/action-k3s-helm@v3
         if: matrix.k3s-helm-version == 'v3'
         with:
