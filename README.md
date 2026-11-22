@@ -40,6 +40,16 @@ You must delete the PVCs manually if you want a fresh installation.
 
 ## Breaking changes
 
+### OMERO.server 0.5.0
+
+- Kubernetes 1.35+ is required.
+
+### OMERO.web 0.5.0
+
+- The Bitnami Redis helm chart has been replaced by the [Valkey Helm chart](https://valkey.io/valkey-helm/).
+  Configuration is under the `valkey` key in values.yaml
+- Kubernetes 1.35+ is required.
+
 ### OMERO.server 0.4.0
 
 - PostgreSQL is no longer automatically deployed due to the complexity of managing major version upgrades.
@@ -94,4 +104,4 @@ This is all handled using [Chartpress](./ci/chartpress.py).
 
 See:
 
-- [`.github/workflows/test.yml`](.github/workflows/test.yml)
+- [`.github/workflows/test_and_publish.yml`](.github/workflows/test_and_publish.yml)

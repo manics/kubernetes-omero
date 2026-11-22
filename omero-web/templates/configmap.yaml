@@ -22,9 +22,9 @@ data:
     config set -- omero.web.prefix {{ .Values.prefix | trimSuffix "/" }}
     config set -- omero.web.static_url {{ .Values.prefix | trimSuffix "/" }}/static
 
-    {{- if .Values.redis.enabled }}
+    {{- if .Values.valkey.enabled }}
     config set -- omero.web.session_engine django.contrib.sessions.backends.cache
-    config set -- omero.web.caches '{ "default": { "BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://:{{ .Values.redis.auth.password }}@{{ .Release.Name }}-redis-master:6379/0" } }'
+    config set -- omero.web.caches '{ "default": { "BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://:{{ .Values.valkey.auth.aclUsers.default.password }}@{{ .Release.Name }}-valkey:6379/0" } }'
 
     {{- end }}
 
