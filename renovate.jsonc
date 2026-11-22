@@ -9,11 +9,8 @@
     "github-actions",
     "helm-requirements",
     "pip_requirements",
-    "pre-commit",
+    // TODO: enable prek once supported: https://github.com/renovatebot/renovate/issues/41683
   ],
-  "pre-commit": {
-    "enabled": true,
-  },
   "customManagers": [
     {
       "customType": "regex",
@@ -33,16 +30,6 @@
       "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "github-actions (non-major)",
-    },
-    {
-      "matchManagers": ["pre-commit"],
-      // Monthly on the 1st day of the month
-      "schedule": ["* * 1 * *"],
-    },
-    {
-      "matchManagers": ["pre-commit"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "pre-commit (non-major)",
     },
     {
       "matchDatasources": ["docker"],
