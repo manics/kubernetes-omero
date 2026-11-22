@@ -23,11 +23,11 @@ jobs:
       matrix:
         include:
           - k3s-version: v1.21.0+k3s1
-            helm-version: v3.5.4
+            helm-version: v3.22.1
             # v4 supports k3s 1.24+
             k3s-helm-version: v3
-          - k3s-version: v1.32.3+k3s1
-            helm-version: v3.17.2
+          - k3s-version: v1.37.2+k3s1
+            helm-version: v4.3.2
     steps:
       - uses: actions/checkout@v7
         with:
@@ -101,7 +101,7 @@ jobs:
 
       - uses: azure/setup-helm@v5
         with:
-          version: v3.22.1
+          version: v4.3.2
 
       - name: Install dependencies
         run: pip install -r dev-requirements.txt
