@@ -7,7 +7,7 @@ on:
 
 jobs:
   precommit:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 2
     name: Run pre-commit
     steps:
@@ -15,7 +15,7 @@ jobs:
       - uses: j178/prek-action@v3.1.1
 
   test_omero:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 20
     name: Test OMERO Helm charts
     strategy:
@@ -34,6 +34,12 @@ jobs:
           # chartpress requires the full history
           fetch-depth: 0
 
+      # https://bugs.launchpad.net/ubuntu/+source/linux-oracle/+bug/2172531
+      - name: Workaround AppArmor ContainerD bug
+        run: |
+          echo kernel.apparmor_restrict_unprivileged_unconfined = 0 | sudo tee /etc/sysctl.d/90-apparmor-container-fix.conf
+          sudo sysctl --system
+
       - uses: jupyterhub/action-k3s-helm@v3
         if: matrix.k3s-helm-version == 'v3'
         with:
@@ -48,21 +54,31 @@ jobs:
           helm-version: ${{ matrix.helm-version }}
         # This action should export KUBECONFIG
 
-      - name: Install dependencies
-        run: |
-          conda install -y -q -c conda-forge python=3.12 omero-py pytest requests ruamel.yaml docker-py
-          # $CONDA/bin/pip install -r dev-requirements.txt
-          echo "$CONDA/bin" >> $GITHUB_PATH
+      - name: Setup conda environment
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-name: test
+          cache-environment: true
+          init-shell: "none"
+          create-args: >-
+            python=3.14
+            docker-py
+            omero-py
+            pytest
+            requests
+            ruamel.yaml
 
       - name: Build
+        shell: micromamba-shell {0}
         run: ./ci/build.sh
 
       - name: Test
+        shell: micromamba-shell {0}
         run: ./ci/test.sh
 
   # This job can be used as a required status for Pull Requests
   status:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 2
     name: Status
     needs:
@@ -75,7 +91,7 @@ jobs:
           echo "test_omero: ${{ needs.test_omero.result }}"
 
   publish:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     # `contents: write` allows pushing a tag, but not if the tag includes a
     # change to a workflow. `workflows: write` is available for personal access
     # tokens but not for the temporary GITHUB_TOKEN.
